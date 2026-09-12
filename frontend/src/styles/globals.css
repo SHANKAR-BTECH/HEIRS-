@@ -1,0 +1,159 @@
+/* Global design tokens and base styles */
+:root {
+  /* Light sage / green page background */
+  --bg-main: #f5f8f4;
+  --bg-soft: #edf4ec;
+  --bg-green-soft: #e5f1e7;
+
+  /* Surfaces */
+  --surface: #ffffff;
+  --surface-strong: #ffffff;
+  --surface-soft: #fafcfa;
+
+  /* Primary green family */
+  --green-primary: #397a57;
+  --green-hover: #2f6849;
+  --green-mid: #6fa483;
+  --green-light: #ddeee2;
+
+  /* Text */
+  --text-primary: #1e2923;
+  --text-secondary: #68746d;
+
+  /* Borders */
+  --border: #dce5de;
+  --border-strong: #cbd8cd;
+
+  /* Contrasting category accents (restrained) */
+  --accent-gold: #c7963e;
+  --accent-coral: #c96f5d;
+  --accent-sage: #789c86;
+  --accent-sky: #6c99a8;
+
+  /* Semantics */
+  --success: #3d8058;
+  --success-soft: rgba(61, 128, 88, 0.12);
+  --warning: #b78232;
+  --warning-soft: rgba(183, 130, 50, 0.14);
+  --danger: #b85c55;
+  --danger-soft: rgba(184, 92, 85, 0.1);
+
+  /* Depth / branding darks (used very sparingly) */
+  --dark-900: #2e3a32;
+  --dark-800: #37463b;
+  --dark-700: #44554a;
+
+  /* Aliases (kept so components keep working) */
+  --accent: var(--green-primary);
+  --accent-hover: var(--green-hover);
+  --accent-mid: var(--green-mid);
+  --accent-light: var(--green-light);
+  --accent-soft: rgba(57, 122, 87, 0.1);
+  --amber: var(--accent-gold);
+  --amber-soft: #faf3e4;
+  --info: var(--accent-sage);
+  --info-soft: rgba(120, 156, 134, 0.16);
+  --primary: var(--accent);
+  --primary-dark: var(--accent-hover);
+  --primary-soft: var(--accent-soft);
+  --secondary: var(--text-secondary);
+  --text: var(--text-primary);
+  --background: var(--bg-soft);
+  --border-neutral: rgba(30, 41, 35, 0.12);
+  --border-glass: rgba(255, 255, 255, 0.6);
+  --error: var(--danger);
+  --error-soft: var(--danger-soft);
+
+  /* Old-name aliases for stray references */
+  --accent-teal: var(--accent);
+  --accent-teal-hover: var(--accent-hover);
+  --accent-teal-soft: var(--accent-soft);
+  --accent-amber: var(--accent-gold);
+  --accent-amber-soft: var(--amber-soft);
+  --dark-600: #5b6b60;
+
+  /* Shape & elevation */
+  --radius-sm: 6px;
+  --radius-md: 9px;
+  --radius-lg: 12px;
+  --shadow-sm: 0 1px 3px rgba(30, 50, 38, 0.06);
+  --shadow-md: 0 8px 24px rgba(39, 74, 53, 0.12);
+  --shadow-lg: 0 18px 44px rgba(39, 74, 53, 0.18);
+
+  /* Motion */
+  --transition: all 0.18s ease;
+  --transition-slow: all 0.24s ease;
+
+  --font-stack: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-stack);
+  color: var(--text-primary);
+  background-color: var(--bg-main);
+  background-image:
+    radial-gradient(1000px 560px at 12% -12%, rgba(111, 164, 131, 0.14), transparent 62%),
+    radial-gradient(820px 520px at 104% -6%, rgba(199, 150, 62, 0.06), transparent 55%),
+    linear-gradient(180deg, #f7faf6 0%, var(--bg-main) 40%);
+  background-attachment: fixed;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img,
+svg {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+button {
+  font-family: inherit;
+}
+
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::selection {
+  background-color: rgba(57, 122, 87, 0.16);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
