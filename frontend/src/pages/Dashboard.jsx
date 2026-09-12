@@ -61,7 +61,7 @@ export default function Dashboard() {
             <Link
               key={key}
               to={`/search?category=${encodeURIComponent(key)}`}
-              className="hero-chip"
+              className={`hero-chip ${key.toLowerCase()}`}
             >
               <span>{key}</span>
               <span className="hero-chip-count">{count}</span>

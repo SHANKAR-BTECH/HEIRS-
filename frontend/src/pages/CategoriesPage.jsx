@@ -44,7 +44,7 @@ export default function CategoriesPage() {
         {categorySummary.map(({ key, count, recent }) => {
           const Icon = CATEGORY_ICONS[key];
           return (
-            <article key={key} className="category-panel">
+            <article key={key} className={`category-panel ${key.toLowerCase()}`}>
               <div className="category-panel-head">
                 <div className="category-icon-square">
                   <Icon className="category-icon" aria-hidden="true" />

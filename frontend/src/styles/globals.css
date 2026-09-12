@@ -1,65 +1,79 @@
-/* Global design tokens and base styles */
+/* Global design tokens and base styles — HEIRS premium soft palette */
 :root {
-  /* Light sage / green page background */
-  --bg-main: #f5f8f4;
-  --bg-soft: #edf4ec;
-  --bg-green-soft: #e5f1e7;
+  /* Core HEIRS palette */
+  --heirs-bg: #f8f7fa;
+  --heirs-surface: #ffffff;
+  --heirs-blush: #f5e6e8;
+  --heirs-lavender-light: #d5c6e0;
+  --heirs-lavender: #aaa1c8;
+  --heirs-mauve: #967aa1;
+  --heirs-navy: #192a51;
+  --heirs-text: #20263a;
+  --heirs-text-muted: #6e7182;
+  --heirs-border: rgba(25, 42, 81, 0.08);
+  --heirs-border-strong: rgba(25, 42, 81, 0.16);
+  --heirs-shadow: rgba(25, 42, 81, 0.08);
+
+  /* Background layers */
+  --bg-main: #f8f7fa;
+  --bg-soft: #f3f1f8;
+  --bg-green-soft: #edeaf4;
 
   /* Surfaces */
   --surface: #ffffff;
   --surface-strong: #ffffff;
-  --surface-soft: #fafcfa;
+  --surface-soft: #fbfafd;
 
-  /* Primary green family */
-  --green-primary: #397a57;
-  --green-hover: #2f6849;
-  --green-mid: #6fa483;
-  --green-light: #ddeee2;
+  /* Primary navy family (primary controls) */
+  --green-primary: var(--heirs-navy);
+  --green-hover: #2a3b63;
+  --green-mid: var(--heirs-mauve);
+  --green-light: var(--heirs-lavender-light);
 
   /* Text */
-  --text-primary: #1e2923;
-  --text-secondary: #68746d;
+  --text-primary: var(--heirs-text);
+  --text-secondary: var(--heirs-text-muted);
 
   /* Borders */
-  --border: #dce5de;
-  --border-strong: #cbd8cd;
+  --border: var(--heirs-border);
+  --border-strong: var(--heirs-border-strong);
 
-  /* Contrasting category accents (restrained) */
-  --accent-gold: #c7963e;
-  --accent-coral: #c96f5d;
-  --accent-sage: #789c86;
-  --accent-sky: #6c99a8;
+  /* Category accents (soft pastel family) */
+  --accent-gold: var(--heirs-mauve);
+  --accent-coral: #a5654b;
+  --accent-sage: #7a6fa8;
+  --accent-sky: #6e7aa8;
 
-  /* Semantics */
-  --success: #3d8058;
-  --success-soft: rgba(61, 128, 88, 0.12);
-  --warning: #b78232;
-  --warning-soft: rgba(183, 130, 50, 0.14);
-  --danger: #b85c55;
-  --danger-soft: rgba(184, 92, 85, 0.1);
+  /* Semantics (green badge stays acceptable) */
+  --success: #2f7d52;
+  --success-soft: rgba(47, 125, 82, 0.12);
+  --warning: #a06a1f;
+  --warning-soft: rgba(160, 106, 31, 0.13);
+  --danger: #b0534c;
+  --danger-soft: rgba(176, 83, 76, 0.1);
 
   /* Depth / branding darks (used very sparingly) */
-  --dark-900: #2e3a32;
-  --dark-800: #37463b;
-  --dark-700: #44554a;
+  --dark-900: #1a2240;
+  --dark-800: #232d4f;
+  --dark-700: #2e3a61;
 
   /* Aliases (kept so components keep working) */
-  --accent: var(--green-primary);
+  --accent: var(--heirs-navy);
   --accent-hover: var(--green-hover);
-  --accent-mid: var(--green-mid);
-  --accent-light: var(--green-light);
-  --accent-soft: rgba(57, 122, 87, 0.1);
-  --amber: var(--accent-gold);
-  --amber-soft: #faf3e4;
+  --accent-mid: var(--heirs-mauve);
+  --accent-light: var(--heirs-lavender-light);
+  --accent-soft: rgba(150, 122, 161, 0.12);
+  --amber: var(--heirs-mauve);
+  --amber-soft: #f5e6e8;
   --info: var(--accent-sage);
-  --info-soft: rgba(120, 156, 134, 0.16);
+  --info-soft: rgba(122, 111, 168, 0.14);
   --primary: var(--accent);
   --primary-dark: var(--accent-hover);
   --primary-soft: var(--accent-soft);
   --secondary: var(--text-secondary);
   --text: var(--text-primary);
   --background: var(--bg-soft);
-  --border-neutral: rgba(30, 41, 35, 0.12);
+  --border-neutral: rgba(25, 42, 81, 0.12);
   --border-glass: rgba(255, 255, 255, 0.6);
   --error: var(--danger);
   --error-soft: var(--danger-soft);
@@ -70,15 +84,15 @@
   --accent-teal-soft: var(--accent-soft);
   --accent-amber: var(--accent-gold);
   --accent-amber-soft: var(--amber-soft);
-  --dark-600: #5b6b60;
+  --dark-600: #4e5073;
 
-  /* Shape & elevation */
-  --radius-sm: 6px;
-  --radius-md: 9px;
-  --radius-lg: 12px;
-  --shadow-sm: 0 1px 3px rgba(30, 50, 38, 0.06);
-  --shadow-md: 0 8px 24px rgba(39, 74, 53, 0.12);
-  --shadow-lg: 0 18px 44px rgba(39, 74, 53, 0.18);
+  /* Shape & elevation (soft navy-tinted) */
+  --radius-sm: 8px;
+  --radius-md: 11px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 2px 10px rgba(25, 42, 81, 0.05);
+  --shadow-md: 0 10px 28px rgba(25, 42, 81, 0.1);
+  --shadow-lg: 0 20px 48px rgba(25, 42, 81, 0.16);
 
   /* Motion */
   --transition: all 0.18s ease;
@@ -103,9 +117,9 @@ body {
   color: var(--text-primary);
   background-color: var(--bg-main);
   background-image:
-    radial-gradient(1000px 560px at 12% -12%, rgba(111, 164, 131, 0.14), transparent 62%),
-    radial-gradient(820px 520px at 104% -6%, rgba(199, 150, 62, 0.06), transparent 55%),
-    linear-gradient(180deg, #f7faf6 0%, var(--bg-main) 40%);
+    radial-gradient(1000px 560px at 10% -12%, rgba(245, 230, 232, 0.55), transparent 62%),
+    radial-gradient(820px 520px at 104% -6%, rgba(213, 198, 224, 0.26), transparent 55%),
+    linear-gradient(135deg, #fafafc 0%, #f8f5f9 50%, #f4f5fa 100%);
   background-attachment: fixed;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
@@ -138,13 +152,13 @@ button:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 [tabindex]:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--heirs-mauve);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
 ::selection {
-  background-color: rgba(57, 122, 87, 0.16);
+  background-color: rgba(150, 122, 161, 0.2);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -175,7 +175,7 @@ function ReportStat({ icon: Icon, label, value, hint }) {
 }
 
 function BarDistribution({ items, max }) {
-  const palette = ['#397a57', '#c7963e', '#6fa483', '#6c99a8', '#a55243'];
+  const palette = ['#192A51', '#967AA1', '#AAA1C8', '#D5C6E0', '#8A4A63'];
   return (
     <ul className="bar-distribution">
       {items.map((entry, index) => {
