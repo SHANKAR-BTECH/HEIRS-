@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Building2, Hash, CalendarDays, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { StatusBadge } from './StatusBadge';
 import { normalizeCategory } from '../lib/searchUtils';
 import { CATEGORY_ICONS } from '../data/mockCategories';
@@ -25,33 +25,23 @@ export function RecordCard({ record }) {
 
       <p className="record-description">{record.description}</p>
 
-      {Array.isArray(record.keywords) && record.keywords.length > 0 && (
-        <div className="record-card-keywords" aria-label="Keywords">
-          {record.keywords.slice(0, 3).map((keyword) => (
-            <span key={keyword} className="tag">
-              {keyword}
-            </span>
-          ))}
+      <dl className="record-meta">
+        <div className="record-department">
+          <dt className="sr-only">Department</dt>
+          <dd>{record.department}</dd>
         </div>
-      )}
-
-      <div className="record-meta">
-        <span className="record-meta-item" title={record.referenceNumber}>
-          <Hash aria-hidden="true" className="meta-icon" />
-          <span>{record.referenceNumber}</span>
-        </span>
-        <span className="record-meta-item" title={record.department}>
-          <Building2 aria-hidden="true" className="meta-icon" />
-          <span>{record.department}</span>
-        </span>
-        <span className="record-meta-item">
-          <CalendarDays aria-hidden="true" className="meta-icon" />
-          <span>{record.publicationYear}</span>
-        </span>
-      </div>
+        <div className="record-reference">
+          <dt className="sr-only">Reference number</dt>
+          <dd>{record.referenceNumber}</dd>
+        </div>
+        <div className="record-year">
+          <dt className="sr-only">Publication year</dt>
+          <dd>{record.publicationYear}</dd>
+        </div>
+      </dl>
 
       <div className="record-card-foot">
-        <Link to={`/records/${record.id}`} className="record-card-link">
+        <Link to={`/records/${record.id}`} className="record-card-link" aria-label={`View details: ${record.title}`}>
           View Details
           <ArrowRight aria-hidden="true" className="btn-icon" />
         </Link>

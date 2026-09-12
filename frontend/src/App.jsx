@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Menu, X } from 'lucide-react';
 import { Routes, Route, Outlet } from 'react-router-dom';
 import { AppSidebar } from './components/AppSidebar';
 import { AppHeader } from './components/AppHeader';
@@ -16,26 +17,16 @@ function AppLayout() {
 
   return (
     <div className="app-container">
+      <a href="#main-content" className="skip-link">Skip to content</a>
       <button
         type="button"
         className="mobile-menu-toggle"
-        aria-label="Toggle navigation"
+        aria-label={sidebarOpen ? 'Close navigation' : 'Open navigation'}
+        aria-expanded={sidebarOpen}
+        aria-controls="primary-navigation"
         onClick={() => setSidebarOpen((open) => !open)}
       >
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <line x1="4" y1="12" x2="20" y2="12" />
-          <line x1="4" y1="6" x2="20" y2="6" />
-          <line x1="4" y1="18" x2="20" y2="18" />
-        </svg>
+        {sidebarOpen ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
       </button>
       <div
         className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`}
@@ -45,7 +36,7 @@ function AppLayout() {
       <AppSidebar open={sidebarOpen} onNavigate={() => setSidebarOpen(false)} />
       <div className="main-content">
         <AppHeader />
-        <main className="content-area">
+        <main id="main-content" tabIndex={-1} className="content-area">
           <Outlet />
         </main>
       </div>

@@ -9,13 +9,14 @@ import { searchRecords, getDefaultFilters } from '../lib/searchUtils';
 import '../App.css';
 
 export default function SearchPage() {
-  const { records } = useRecords();
+  const { records, rememberSearch } = useRecords();
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState('');
   const [filters, setFilters] = useState(getDefaultFilters());
 
   useEffect(() => {
     const fromUrl = searchParams.get('q') || '';
+    rememberSearch(fromUrl);
     const rawCategory = searchParams.get('category');
     const category = rawCategory === 'Rules' ? 'Rule' : rawCategory || 'All';
     setQuery(fromUrl);
@@ -23,7 +24,7 @@ export default function SearchPage() {
       ...prev,
       category,
     }));
-  }, [searchParams]);
+  }, [searchParams, rememberSearch]);
 
   const results = useMemo(
     () => searchRecords(records, { ...filters, query }),
@@ -63,7 +64,7 @@ export default function SearchPage() {
   return (
     <div className="page-stack">
       <div className="content-header">
-        <h2 className="content-title">Search &amp; Retrieval</h2>
+        <h1 className="content-title">Search &amp; Retrieval</h1>
         <p className="content-subtitle">
           Search Higher Education Department records using keywords and filters.
         </p>
@@ -92,6 +93,7 @@ export default function SearchPage() {
       <FilterPanel filters={filters} onFiltersChange={handleFiltersChange} />
 
       <div className="results-info">
+        <h2 className="sr-only">Search results</h2>
         <p className="results-count" role="status">
           <strong>{results.length}</strong>{' '}
           {results.length === 1 ? 'record' : 'records'} found
@@ -124,7 +126,7 @@ export default function SearchPage() {
           onAction={clearAll}
         />
       ) : (
-        <div className="results-grid">
+        <div className="results-grid section-zone zone-lavender">
           {results.map((record) => (
             <RecordCard key={record.id} record={record} />
           ))}

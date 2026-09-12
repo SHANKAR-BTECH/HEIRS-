@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { mockRecords } from '../data/mockRecords';
 
 // Frontend-only record store. Mirrors the future Spring Boot CRUD contract
@@ -19,10 +19,21 @@ function generateId(record) {
 
 export function RecordsProvider({ children }) {
   const [records, setRecords] = useState(mockRecords);
+  const [recentSearches, setRecentSearches] = useState([]);
+  const rememberSearch = useCallback((value) => {
+    const query = value.trim();
+    if (query) {
+      setRecentSearches((previous) =>
+        [query, ...previous.filter((item) => item !== query)].slice(0, 5)
+      );
+    }
+  }, []);
 
   const value = useMemo(
     () => ({
       records,
+      recentSearches,
+      rememberSearch,
       addRecord: (record) =>
         setRecords((prev) => [
           { ...record, id: record.id || generateId(record) },
@@ -37,7 +48,7 @@ export function RecordsProvider({ children }) {
       deleteRecord: (id) =>
         setRecords((prev) => prev.filter((record) => record.id !== id)),
     }),
-    [records]
+    [records, recentSearches, rememberSearch]
   );
 
   return (

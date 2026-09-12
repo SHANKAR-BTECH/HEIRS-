@@ -1,4 +1,4 @@
-import { Home, Search, FolderKanban, FileText, BarChart2, ChevronRight, Landmark } from 'lucide-react';
+import { Home, Search, FolderKanban, FileText, BarChart2, Landmark } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import '../App.css';
 
@@ -12,14 +12,14 @@ export function AppSidebar({ open = false, onNavigate }) {
   ];
 
   return (
-    <aside className={`app-sidebar ${open ? 'open' : ''}`}>
+    <aside id="primary-navigation" className={`app-sidebar ${open ? 'open' : ''}`}>
       <div className="sidebar-header">
         <div className="sidebar-brand-row">
           <div className="sidebar-logo">
             <Landmark className="logo-mark-icon" aria-hidden="true" />
           </div>
           <div className="sidebar-brand-name">
-            <span>HEI</span><span className="sidebar-brand-accent">RS</span>
+            HEIRS
           </div>
         </div>
         <div className="sidebar-subtitle">Institutional Document Retrieval Portal</div>
@@ -36,17 +36,12 @@ export function AppSidebar({ open = false, onNavigate }) {
           >
             <item.icon className="nav-icon" aria-hidden="true" />
             <span className="nav-label">{item.label}</span>
-            <ChevronRight className="nav-arrow" aria-hidden="true" />
           </NavLink>
         ))}
       </nav>
 
       <div className="sidebar-footer">
-        <div className="status-indicator">
-          <span className="status-dot active" aria-hidden="true" />
-          <span>System Ready</span>
-        </div>
-        <div className="version-info">Frontend Prototype · HEIRS v1.0</div>
+        <div className="version-info">Institutional record library</div>
       </div>
     </aside>
   );

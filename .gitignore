@@ -30,3 +30,10 @@ Thumbs.db
 
 # Vite
 frontend/.vite/
+
+# Agent / Tooling files
+.agents/
+.codex/
+.impeccable/
+.opencode/
+skills-lock.json

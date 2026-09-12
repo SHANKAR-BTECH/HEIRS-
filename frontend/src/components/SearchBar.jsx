@@ -15,9 +15,9 @@ export function SearchBar() {
   };
 
   return (
-    <form className="search-bar" onSubmit={handleSearch}>
+    <form role="search" className="search-bar" onSubmit={handleSearch}>
       <div className="search-input-wrapper">
-        <Search className="search-icon" />
+        <Search className="search-icon" aria-hidden="true" />
         <input
           type="text"
           value={query}

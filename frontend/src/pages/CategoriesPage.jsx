@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useRecords } from '../context/RecordsContext';
 import {
@@ -11,7 +11,6 @@ import { getRecentRecords, normalizeCategory } from '../lib/searchUtils';
 import '../App.css';
 
 export default function CategoriesPage() {
-  const navigate = useNavigate();
   const { records } = useRecords();
 
   const categorySummary = useMemo(() => {
@@ -33,14 +32,14 @@ export default function CategoriesPage() {
   return (
     <div className="page-stack">
       <div className="content-header">
-        <h2 className="content-title">Browse Categories</h2>
+        <h1 className="content-title">Browse Categories</h1>
         <p className="content-subtitle">
           Explore the five record classes maintained by the higher education
           information repository.
         </p>
       </div>
 
-      <div className="category-list">
+      <div className="category-list section-zone zone-mist">
         {categorySummary.map(({ key, count, recent }) => {
           const Icon = CATEGORY_ICONS[key];
           return (
@@ -50,7 +49,7 @@ export default function CategoriesPage() {
                   <Icon className="category-icon" aria-hidden="true" />
                 </div>
                 <div className="category-panel-title">
-                  <h3 className="category-name">{key}</h3>
+                  <h2 className="category-name">{key}</h2>
                   <p className="category-description">{CATEGORY_DESCRIPTIONS[key]}</p>
                 </div>
                 <span className="category-count-badge">{count} records</span>
@@ -62,28 +61,26 @@ export default function CategoriesPage() {
                   <ul className="category-recent-list">
                     {recent.map((record) => (
                       <li key={record.id}>
-                        <button
-                          type="button"
+                        <Link
                           className="category-recent-item"
-                          onClick={() => navigate(`/records/${record.id}`)}
+                          to={`/records/${record.id}`}
                         >
                           <span className="recent-item-title">{record.title}</span>
                           <span className="recent-item-ref">{record.referenceNumber}</span>
-                        </button>
+                        </Link>
                       </li>
                     ))}
                   </ul>
                 </div>
               )}
 
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => navigate(`/search?category=${encodeURIComponent(key)}`)}
+              <Link
+                className="btn btn-secondary"
+                to={`/search?category=${encodeURIComponent(key)}`}
               >
                 Browse {key}
                 <ArrowRight className="btn-icon" aria-hidden="true" />
-              </button>
+              </Link>
             </article>
           );
         })}

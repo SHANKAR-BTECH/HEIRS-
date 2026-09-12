@@ -1,8 +1,7 @@
 import { useMemo } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
-  ArrowRight,
   Building2,
   Hash,
   CalendarDays,
@@ -77,16 +76,15 @@ export default function RecordDetailsPage() {
           <span className={`category-pill ${category.toLowerCase()}`}>{category}</span>
           <StatusBadge status={record.status} />
         </div>
-        <h2 className="detail-title">{record.title}</h2>
-        <p className="detail-subtitle">{record.description}</p>
+        <h1 className="detail-title">{record.title}</h1>
       </header>
 
       <div className="detail-grid">
         <div className="detail-main">
-          <section className="card detail-section" aria-labelledby="metadata-heading">
-            <h3 id="metadata-heading" className="detail-section-title">
+          <section className="detail-section detail-section-flush" aria-labelledby="metadata-heading">
+            <h2 id="metadata-heading" className="detail-section-title">
               Record Metadata
-            </h3>
+            </h2>
             <dl className="metadata-list">
               {metadata.map(({ label, value, icon: IconComponent }) => (
                 <div key={label} className="metadata-item">
@@ -100,20 +98,13 @@ export default function RecordDetailsPage() {
             </dl>
           </section>
 
-          <section className="card detail-section" aria-labelledby="overview-heading">
-            <h3 id="overview-heading" className="detail-section-title">Overview</h3>
+          <section className="detail-section detail-section-flush" aria-labelledby="overview-heading">
+            <h2 id="overview-heading" className="detail-section-title">Overview</h2>
             <p className="detail-paragraph">{record.description}</p>
-            <p className="detail-paragraph">
-              This {category.toLowerCase()} is maintained by the{' '}
-              {record.department} and is identified by reference number{' '}
-              {record.referenceNumber}. It is part of the consolidated Higher
-              Education information repository available to institutions,
-              administrators and the public.
-            </p>
           </section>
 
-          <section className="card detail-section" aria-labelledby="key-info-heading">
-            <h3 id="key-info-heading" className="detail-section-title">Key Information</h3>
+          <section className="detail-section detail-section-flush" aria-labelledby="key-info-heading">
+            <h2 id="key-info-heading" className="detail-section-title">Key Information</h2>
             <dl className="key-info-list">
               {Object.entries(keyInfo).map(([label, value]) => (
                 <div key={label} className="key-info-item">
@@ -124,8 +115,8 @@ export default function RecordDetailsPage() {
             </dl>
           </section>
 
-          <section className="card detail-section" aria-labelledby="docs-heading">
-            <h3 id="docs-heading" className="detail-section-title">Supporting Documents</h3>
+          <section className="detail-section detail-section-flush" aria-labelledby="docs-heading">
+            <h2 id="docs-heading" className="detail-section-title">Supporting Documents</h2>
             <ul className="document-list">
               {documents.map((doc) => (
                 <li key={doc.name} className="document-item">
@@ -143,7 +134,7 @@ export default function RecordDetailsPage() {
                     className="btn btn-sm btn-secondary document-download"
                     onClick={() => {
                       window.alert(
-                        'Document download will be available when backend integration is connected.'
+                        'This document is not available in this preview.'
                       );
                     }}
                   >
@@ -154,16 +145,16 @@ export default function RecordDetailsPage() {
               ))}
             </ul>
             <p className="prototype-note">
-              Prototype mode: files are placeholders. Download becomes active with the backend integration.
+              Document files are not available in this preview.
             </p>
           </section>
         </div>
 
         <aside className="detail-side">
           <section className="card detail-section" aria-labelledby="keywords-heading">
-            <h3 id="keywords-heading" className="detail-section-title">
+            <h2 id="keywords-heading" className="detail-section-title">
               <Tag className="section-icon" aria-hidden="true" /> Keywords
-            </h3>
+            </h2>
             <div className="detail-tags">
               {(record.keywords || []).map((keyword) => (
                 <span key={keyword} className="tag">
@@ -175,33 +166,12 @@ export default function RecordDetailsPage() {
               )}
             </div>
           </section>
-
-          <section className="card detail-section" aria-labelledby="related-heading">
-            <h3 id="related-heading" className="detail-section-title">Related {category}</h3>
-            {related.length > 0 ? (
-              <ul className="related-list">
-                {related.map((relatedRecord) => (
-                  <li key={relatedRecord.id}>
-                    <Link to={`/records/${relatedRecord.id}`} className="related-item">
-                      <span className="related-item-title">{relatedRecord.title}</span>
-                      <span className="related-item-ref">
-                        {relatedRecord.referenceNumber}
-                        <ArrowRight className="related-arrow" aria-hidden="true" />
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="detail-paragraph muted">No related records available.</p>
-            )}
-          </section>
         </aside>
       </div>
 
       {related.length > 0 && (
         <section aria-labelledby="related-cards-heading" className="related-cards-section">
-          <h3 id="related-cards-heading" className="detail-section-title">More in this category</h3>
+          <h2 id="related-cards-heading" className="detail-section-title">Related Records</h2>
           <div className="results-grid">
             {related.map((relatedRecord) => (
               <RecordCard key={relatedRecord.id} record={relatedRecord} />

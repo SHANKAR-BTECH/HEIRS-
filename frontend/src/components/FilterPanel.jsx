@@ -52,7 +52,7 @@ export function FilterPanel({ filters, onFiltersChange }) {
     <div className="filter-panel">
       <div className="filter-header">
         <div className="filter-title-wrap">
-          <h3 className="filter-title">Filters</h3>
+          <h2 className="filter-title">Filters</h2>
           {hasActiveFilters && (
             <span className="filter-count">{countActive(activeFilters)} active</span>
           )}

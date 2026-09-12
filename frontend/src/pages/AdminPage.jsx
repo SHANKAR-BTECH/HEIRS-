@@ -128,6 +128,18 @@ export default function AdminPage() {
 
   useEffect(() => {
     const onKey = (e) => {
+      if (e.key === 'Tab' && modalFocusRef.current) {
+        const items = modalFocusRef.current.querySelectorAll('button, input, select, textarea, [tabindex="0"]');
+        const first = items[0];
+        const last = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last?.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first?.focus();
+        }
+      }
       if (e.key === 'Escape') {
         setModalOpen(false);
         setDeleteTarget(null);
@@ -157,7 +169,7 @@ export default function AdminPage() {
     <div className="page-stack">
       <div className="content-header admin-header">
         <div>
-          <h2 className="content-title">Manage Records</h2>
+          <h1 className="content-title">Manage Records</h1>
           <p className="content-subtitle">
             Add, review and maintain the records in the information repository.
           </p>
@@ -169,12 +181,12 @@ export default function AdminPage() {
       </div>
 
       <div className="admin-note" role="note">
-        Prototype mode: Changes are stored in frontend state only. A Spring Boot
-        backend will provide persistent CRUD later.
+        Preview: changes last for this session and reset when you reload.
       </div>
 
       <div className="card table-card">
-        <div className="table-scroll">
+        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- Focus enables native keyboard scrolling of this named table region. */}
+        <div className="table-scroll" role="region" aria-label="Manage records table" tabIndex={0}>
           <table className="table admin-table">
             <thead>
               <tr>
@@ -265,7 +277,7 @@ export default function AdminPage() {
             </div>
 
             <form onSubmit={handleSave}>
-              <div className="form-row">
+              <div className="form-row form-row-full">
                 <div className="form-group">
                   <label className="form-label" htmlFor="field-title">
                     Title <span className="required">*</span>
