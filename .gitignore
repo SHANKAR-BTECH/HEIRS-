@@ -1,4 +1,6 @@
 # Dependencies
+backend/local-storage/
+local-storage/
 node_modules/
 frontend/node_modules/
 

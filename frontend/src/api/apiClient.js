@@ -67,7 +67,9 @@ async function parseErrorResponse(response, endpoint) {
 export async function apiFetch(path, { method = 'GET', body, params } = {}) {
   const options = { method };
   const headers = {};
-  if (body !== undefined) {
+  if (body instanceof FormData) {
+    options.body = body;
+  } else if (body !== undefined) {
     headers['Content-Type'] = 'application/json';
     options.body = JSON.stringify(body);
   }

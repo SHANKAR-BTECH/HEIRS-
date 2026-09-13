@@ -179,3 +179,66 @@ Validation example:
 | 500 | Unexpected error; details logged server-side, generic public message |
 
 CORS preflight rejection is handled by Spring's CORS filter (403); it is not an application JSON error. Both local Vite origins are allowed, with GET/POST/PUT/DELETE/OPTIONS and exposed `Location`. JavaFX uses ordinary HTTP without browser CORS enforcement.
+# Supporting document API (Phase 4)
+
+Base URL: `http://127.0.0.1:8080`. PDF uploads use `multipart/form-data`; JSON record endpoints retain their existing contract. Clients must let their multipart library generate the boundary. A record may have zero, one, or many attachments.
+
+| Method | Endpoint | Success |
+|---|---|---|
+| POST | `/api/records/{recordId}/documents` | 201; array of newly attached document DTOs |
+| GET | `/api/records/{recordId}/documents` | 200; all attachments ordered by ID, or `[]` |
+| GET | `/api/documents/{documentId}/preview` | 200; PDF bytes, inline disposition |
+| GET | `/api/documents/{documentId}/download` | 200; PDF bytes, attachment disposition |
+| PUT | `/api/documents/{documentId}/replace` | 200; updated document DTO |
+| DELETE | `/api/documents/{documentId}` | 204; metadata removed and file cleanup committed |
+
+Example document DTO (timestamps are UTC):
+
+```json
+{
+  "id": 8,
+  "recordId": 12,
+  "originalFileName": "Main_Policy.pdf",
+  "contentType": "application/pdf",
+  "fileSize": 1845932,
+  "uploadedAt": "2026-09-13T12:00:00",
+  "updatedAt": "2026-09-13T12:00:00"
+}
+```
+
+No physical paths or storage keys are returned. Preview/download preserve the safe original filename using UTF-8 Content-Disposition, send `application/pdf`, content length, `X-Content-Type-Options: nosniff`, and `Cache-Control: no-store`. PDFs use the browser's native viewer.
+
+From PowerShell, upload three files in **one request** using repeated `files` fields:
+
+```powershell
+curl.exe -f -X POST 'http://127.0.0.1:8080/api/records/12/documents' `
+  -F 'files=@Main_Policy.pdf;type=application/pdf' `
+  -F 'files=@Amendment_1.pdf;type=application/pdf' `
+  -F 'files=@Annexure_A.pdf;type=application/pdf'
+
+curl.exe -f 'http://127.0.0.1:8080/api/records/12/documents'
+curl.exe -f 'http://127.0.0.1:8080/api/documents/8/preview' -o preview.pdf
+curl.exe -f 'http://127.0.0.1:8080/api/documents/8/download' -o Main_Policy.pdf
+
+# Replacement accepts exactly the single file field, and preserves document ID 8.
+curl.exe -f -X PUT 'http://127.0.0.1:8080/api/documents/8/replace' `
+  -F 'file=@Revised_Policy.pdf;type=application/pdf'
+
+curl.exe -f -X DELETE 'http://127.0.0.1:8080/api/documents/8'
+```
+
+A one-file upload uses the same POST with one `files` part. Additional POSTs append documents; duplicate original filenames are supported. Replacement affects only the selected ID and preserves `uploadedAt`; removal affects only the selected document. `DELETE /api/records/{id}` also removes all attachment metadata and stored files.
+
+Validation: PDFs only; `.pdf` extension, `application/pdf` MIME type, and `%PDF-` signature required. Non-empty, safe filename up to 180 characters. Default maximum: **20 MiB (20,971,520 bytes) per file**; **100 MiB (104,857,600 bytes) per multipart request including overhead**. Configure through `HEIRS_MAX_FILE_BYTES` and `HEIRS_MAX_REQUEST_BYTES`. See [README.md](README.md) for storage configuration.
+
+All files are validated before any batch persistence. Invalid members reject the whole batch; database/storage failures roll the batch back and clean newly written files. Existing siblings remain unchanged. Old-file removal runs after commit with durable retry jobs: if the filesystem is temporarily unavailable, the mutation still succeeds and physical removal is retried every minute and after restart. See README for the process-crash and simultaneous-outage limitations.
+
+Errors use the existing `ApiErrorDto` envelope (`timestamp`, `status`, `error`, `message`, `path`, `fieldErrors`):
+
+| Status | Meaning |
+|---|---|
+| 400 | Missing multipart field, empty/invalid file, unsafe filename, or invalid identifier |
+| 404 | Missing parent record, document metadata, or stored file |
+| 413 | File or total multipart request exceeds the configured size limit |
+| 415 | Unsupported request Content-Type |
+| 500 | Storage/database operation failed; physical paths are not exposed |

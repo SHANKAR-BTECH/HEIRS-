@@ -5,8 +5,6 @@ import {
   Building2,
   Hash,
   CalendarDays,
-  FileText,
-  FileDown,
   FolderOpen,
   Landmark,
   CalendarClock,
@@ -14,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useRecords } from '../context/RecordsContext';
 import { StatusBadge } from '../components/StatusBadge';
+import { SupportingDocuments } from '../components/SupportingDocuments';
 import { EmptyState } from '../components/EmptyState';
 import { RecordCard } from '../components/RecordCard';
 import { LoadingState, InlineError } from '../components/DataState';
@@ -21,7 +20,6 @@ import { getRecordById as getRecordByIdApi } from '../api/recordsApi';
 import {
   getRelatedRecords,
   getKeyInformation,
-  getDocuments,
   normalizeCategory,
 } from '../lib/searchUtils';
 import '../App.css';
@@ -138,7 +136,6 @@ export default function RecordDetailsPage() {
 
   const category = normalizeCategory(record.category);
   const keyInfo = getKeyInformation(record);
-  const documents = getDocuments(record);
 
   const metadata = [
     { label: 'Reference Number', value: record.referenceNumber, icon: Hash },
@@ -206,36 +203,7 @@ export default function RecordDetailsPage() {
 
           <section className="detail-section detail-section-flush" aria-labelledby="docs-heading">
             <h2 id="docs-heading" className="detail-section-title">Supporting Documents</h2>
-            <ul className="document-list">
-              {documents.map((doc) => (
-                <li key={doc.name} className="document-item">
-                  <div className="document-icon">
-                    <FileText className="meta-icon" aria-hidden="true" />
-                  </div>
-                  <div className="document-info">
-                    <p className="document-name">{doc.name}</p>
-                    <p className="document-meta">
-                      {doc.type} &middot; {doc.size}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    className="btn btn-sm btn-secondary document-download"
-                    onClick={() => {
-                      window.alert(
-                        'This document is not available in this preview.'
-                      );
-                    }}
-                  >
-                    <FileDown className="btn-icon" aria-hidden="true" />
-                    Download
-                  </button>
-                </li>
-              ))}
-            </ul>
-            <p className="prototype-note">
-              Document files are not available in this preview.
-            </p>
+            <SupportingDocuments key={record.id} recordId={record.id} />
           </section>
         </div>
 

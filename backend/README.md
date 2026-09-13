@@ -1,6 +1,6 @@
 # HEIRS backend
 
-Independent REST/JSON API for the React web client and future JavaFX desktop client. No frontend integration, JavaFX, authentication, or document storage is included in this phase.
+Independent REST/JSON API for the integrated React web client and a future JavaFX client. Includes local supporting-document management. Authentication, JavaFX, and cloud storage are outside this phase.
 
 ## Toolchain
 
@@ -168,8 +168,38 @@ This opt-in profile uses **create-drop** and destroys tables in `heirs_test`. A 
 
 See [VERIFICATION.md](VERIFICATION.md) for actual build, MySQL, HTTP, and Git verification results.
 
+## Supporting documents
+
+A record supports zero, one, or many PDF documents. MySQL stores the `heirs_documents` metadata table, with a foreign key and index on `record_id`. Each document has an ID, lazy parent relationship, original filename, unique storage key, MIME type, byte size, and UTC upload/update timestamps. The storage key also serves as the generated stored filename; no redundant filename field or file bytes are stored in MySQL. The inverse `Record.documents` association is lazy and has no automatic cascade: `RecordService` explicitly routes deletion through `DocumentService` so file cleanup cannot be skipped by JPA cascading. REST responses use DTOs and never expose storage keys or filesystem paths.
+
+`DocumentService` depends on `FileStorageService` (`store`, `load`, `exists`, `delete`). `LocalFileStorageService` stores UUID-named files in a directory accessed only through document-ID endpoints. Replacing a file is implemented by storing a new object and scheduling deletion of the old key after the metadata commit. There is no arbitrary static file mount.
+
+From `backend/`, the default location is `backend/local-storage/`, ignored by Git. Relative paths resolve against the server's working directory. For a stable location independent of working directory, configure an absolute path:
+
+```powershell
+$env:HEIRS_STORAGE_PATH = 'C:\Users\Shank\Higher-Education-Information-Retrieval-System\backend\local-storage'
+.\mvnw.cmd spring-boot:run
+```
+
+| Setting | Default | Meaning |
+|---|---|---|
+| `HEIRS_STORAGE_PATH` / `heirs.storage.path` | `local-storage` | Local file directory; auto-created |
+| `HEIRS_MAX_FILE_BYTES` / `heirs.storage.max-file-bytes` | `20971520` | **20 MiB** per document; environment variable also configures the multipart parser |
+| `HEIRS_MAX_REQUEST_BYTES` | `104857600` | **100 MiB** total multipart request, including multipart overhead |
+| `heirs.storage.cleanup-interval-ms` | `60000` | Retry pending file removals every minute |
+
+When configuring the per-file Spring property directly, also set `spring.servlet.multipart.max-file-size` consistently. Use the environment variable to set both together. Keep a custom storage directory out of source control. Back up the database and storage together; both are necessary to restore attachments. Restarting the application does not clear either.
+
+Only `.pdf` with MIME type `application/pdf` and a `%PDF-` content signature is accepted. Validation also rejects empty files, files exceeding the configured size, and unsafe names (path separators, `..`, control/format characters, Windows-reserved punctuation, blank names, or more than 180 characters). A PDF signature check is not full PDF parsing or malware scanning. Duplicate human-readable filenames are allowed because storage keys are unique. All batch files are validated before persistence; an invalid member rejects the entire batch and names the invalid file where safe. Transport-level size rejection returns 413 before application validation and may not identify the offending member.
+
+Uploads append to existing attachments. Replacement preserves the ID and original upload timestamp, updates filename/size/update timestamp, and leaves siblings intact. Document deletion preserves the parent and siblings. Permanent record deletion removes all its document metadata and schedules all stored files for deletion. Mutations lock the parent row to serialize competing uploads, replacements, and deletion.
+
+Newly stored files are removed on transaction rollback. Old-file deletion is recorded in the durable `heirs_file_cleanup` table in the same transaction as metadata changes, then attempted immediately after commit. If a physical deletion fails (for example a Windows file lock), the API mutation remains committed, the failure is logged, and its cleanup job survives restart and retries every minute. Such files are no longer reachable through document endpoints. Rollback cleanup also records a retry if physical removal fails. A database and filesystem are not one atomic transaction: abrupt process termination during a new upload can leave an unreferenced file before rollback callbacks run; a simultaneous database outage and rollback-cleanup failure requires operator reconciliation. No silent claim of distributed atomicity is made.
+
+The React Edit modal includes document listing, multi-file selection with counts, upload status, preview, download, single-file replacement, and confirmation before removal. Creating record metadata keeps the modal open for document attachment. Document operations are saved independently of metadata; canceling metadata edits does not undo completed attachment changes. Record Details uses the same live document list without management controls.
+
+For a future cloud adapter, implement `FileStorageService` with opaque immutable keys, streamed `Resource` loading, partial-write cleanup, and idempotent deletion. Replace the selected storage bean; controllers, DTOs, document service, record logic, and clients need no changes. No cloud service is configured here.
+
 ## Next phase
 
-Connect the React data-access layer to the documented contract while preserving its approved UI. Add explicit adapters for numeric IDs, ISO dates, keyword strings, and paginated responses. JavaFX can later use the same ordinary HTTP/JSON endpoints without CORS requirements or browser sessions.
-
-Then introduce a `Document` entity linked to `Record` (id, recordId, originalFileName, storedFileName, contentType, fileSize, storagePath, uploadedAt), a separate document service/repository, and upload/download endpoints with validation and storage rules. No placeholder upload endpoints or storage logic exist yet. Add authentication/authorization before exposing writable APIs beyond trusted local development, and controlled migrations before production.
+Verify the local document flows with users, then add authentication and role-based authorization for administrator mutations, controlled database migrations, and backup/recovery procedures. Keep cloud storage and JavaFX as separate later phases.

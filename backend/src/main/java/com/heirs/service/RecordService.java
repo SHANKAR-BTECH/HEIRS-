@@ -23,10 +23,13 @@ import org.springframework.validation.annotation.Validated;
 public class RecordService {
   private final RecordRepository repository;
   private final RecordMapper mapper;
+  private final DocumentService documents;
 
-  public RecordService(RecordRepository repository, RecordMapper mapper) {
+  public RecordService(
+      RecordRepository repository, RecordMapper mapper, DocumentService documents) {
     this.repository = repository;
     this.mapper = mapper;
+    this.documents = documents;
   }
 
   public PageResponseDto<RecordResponseDto> getAllRecords(
@@ -67,7 +70,9 @@ public class RecordService {
 
   @Transactional
   public void deleteRecord(@Positive Long id) {
-    repository.delete(requireRecord(id));
+    Record record = repository.lockById(id).orElseThrow(() -> new RecordNotFoundException(id));
+    documents.deleteForRecord(id);
+    repository.delete(record);
     repository.flush();
   }
 

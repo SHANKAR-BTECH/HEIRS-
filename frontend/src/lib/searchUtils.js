@@ -179,26 +179,6 @@ export function getKeyInformation(record) {
   return { ...(byCategory[category] || {}), ...common };
 }
 
-export function getDocuments(record) {
-  const year = record.publicationYear;
-  return [
-    {
-      name: `${record.category} Guidelines ${year}.pdf`,
-      size: '1.2 MB',
-      type: 'PDF',
-    },
-    {
-      name: 'Official Notification.pdf',
-      size: '640 KB',
-      type: 'Notification',
-    },
-    {
-      name: `Reference Appendices ${year}.docx`,
-      size: '420 KB',
-      type: 'Document',
-    },
-  ];
-}
 
 export function getStatusVariant(status) {
   const map = {

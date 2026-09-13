@@ -23,9 +23,10 @@ import org.springframework.data.jpa.domain.Specification;
 @ExtendWith(MockitoExtension.class)
 class RecordServiceTest {
   @Mock RecordRepository repository;
+  @Mock DocumentService documents;
 
   RecordService service() {
-    return new RecordService(repository, new RecordMapper());
+    return new RecordService(repository, new RecordMapper(), documents);
   }
 
   @Test
@@ -111,9 +112,10 @@ class RecordServiceTest {
   @Test
   void deletesExistingRecord() {
     var record = TestRecords.entity("REF/1");
-    when(repository.findById(1L)).thenReturn(Optional.of(record));
+    when(repository.lockById(1L)).thenReturn(Optional.of(record));
     service().deleteRecord(1L);
     verify(repository).delete(record);
+    verify(documents).deleteForRecord(1L);
   }
 
   @Test

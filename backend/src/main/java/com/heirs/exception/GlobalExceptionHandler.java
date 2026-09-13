@@ -21,6 +21,40 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+  @ExceptionHandler(DocumentNotFoundException.class)
+  ResponseEntity<ApiErrorDto> documentMissing(
+      DocumentNotFoundException ex, HttpServletRequest request) {
+    return error(404, ex.getMessage(), request, Map.of());
+  }
+
+  @ExceptionHandler({
+    InvalidDocumentException.class,
+    org.springframework.web.multipart.support.MissingServletRequestPartException.class
+  })
+  ResponseEntity<ApiErrorDto> documentInvalid(Exception ex, HttpServletRequest request) {
+    return error(400, ex.getMessage(), request, Map.of());
+  }
+
+  @ExceptionHandler({
+    DocumentTooLargeException.class,
+    org.springframework.web.multipart.MaxUploadSizeExceededException.class
+  })
+  ResponseEntity<ApiErrorDto> documentTooLarge(Exception ex, HttpServletRequest request) {
+    return error(
+        413,
+        ex instanceof DocumentTooLargeException
+            ? ex.getMessage()
+            : "Upload exceeds the configured file or request size limit",
+        request,
+        Map.of());
+  }
+
+  @ExceptionHandler(StorageException.class)
+  ResponseEntity<ApiErrorDto> storage(StorageException ex, HttpServletRequest request) {
+    log.error("Document storage failure", ex);
+    return error(500, ex.getMessage(), request, Map.of());
+  }
+
   private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
   @ExceptionHandler(RecordNotFoundException.class)
@@ -110,7 +144,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
   ResponseEntity<ApiErrorDto> media(
       HttpMediaTypeNotSupportedException ex, HttpServletRequest request) {
-    return error(415, "Use Content-Type: application/json", request, Map.of());
+    return error(415, "Unsupported Content-Type for this endpoint", request, Map.of());
   }
 
   @ExceptionHandler(Exception.class)

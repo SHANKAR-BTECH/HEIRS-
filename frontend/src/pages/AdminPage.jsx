@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Eye, Pencil, Trash2, X, AlertTriangle } from 'lucide-react';
 import { useRecords } from '../context/RecordsContext';
 import { StatusBadge } from '../components/StatusBadge';
+import { SupportingDocuments } from '../components/SupportingDocuments';
 import '../App.css';
 
 const EMPTY_FORM = {
@@ -55,6 +56,7 @@ export default function AdminPage() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [formError, setFormError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [documentsBusy, setDocumentsBusy] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [toast, setToast] = useState('');
@@ -114,6 +116,7 @@ export default function AdminPage() {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    if (saving || documentsBusy) return;
     const clientError = validate();
     if (clientError) {
       setFormError(clientError);
@@ -126,11 +129,12 @@ export default function AdminPage() {
       if (editingId) {
         await updateRecord(editingId, payload);
         showToast('Record updated.');
+        setModalOpen(false);
       } else {
-        await addRecord(payload);
-        showToast('Record added.');
+        const created = await addRecord(payload);
+        setEditingId(created.id);
+        showToast('Record added. You can now attach documents.');
       }
-      setModalOpen(false);
     } catch (saveError) {
       setFormError(extractErrorMessage(saveError));
     } finally {
@@ -164,7 +168,7 @@ export default function AdminPage() {
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === 'Tab' && modalFocusRef.current) {
-        const items = modalFocusRef.current.querySelectorAll('button, input, select, textarea, [tabindex="0"]');
+        const items = Array.from(modalFocusRef.current.querySelectorAll('button, a[href], input, select, textarea, [tabindex="0"]')).filter((item) => !item.disabled && !item.hidden);
         const first = items[0];
         const last = items[items.length - 1];
         if (e.shiftKey && document.activeElement === first) {
@@ -175,14 +179,14 @@ export default function AdminPage() {
           first?.focus();
         }
       }
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && !documentsBusy && !saving) {
         setModalOpen(false);
         setDeleteTarget(null);
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [documentsBusy, saving]);
 
   useEffect(() => {
     if (modalOpen || deleteTarget) {
@@ -306,6 +310,7 @@ export default function AdminPage() {
                 className="modal-close"
                 onClick={() => setModalOpen(false)}
                 aria-label="Close"
+                disabled={saving || documentsBusy}
               >
                 <X aria-hidden="true" />
               </button>
@@ -458,6 +463,13 @@ export default function AdminPage() {
                 />
               </div>
 
+              <section aria-labelledby="edit-documents-heading">
+                <h4 id="edit-documents-heading" className="detail-section-title">Supporting Documents</h4>
+                {editingId ? <SupportingDocuments key={editingId} recordId={editingId} editable disabled={saving} onBusyChange={setDocumentsBusy} /> : (
+                  <p className="document-meta">Create this record first. You can then attach one or more PDF documents here.</p>
+                )}
+              </section>
+
               {formError && (
                 <p className="form-error" role="alert">
                   {formError}
@@ -469,11 +481,11 @@ export default function AdminPage() {
                   type="button"
                   className="btn btn-secondary"
                   onClick={() => setModalOpen(false)}
-                  disabled={saving}
+                  disabled={saving || documentsBusy}
                 >
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary" disabled={saving}>
+                <button type="submit" className="btn btn-primary" disabled={saving || documentsBusy}>
                   {saving
                     ? 'Saving...'
                     : editingId
@@ -503,7 +515,7 @@ export default function AdminPage() {
             </h3>
             <p className="confirm-text">
               &ldquo;{deleteTarget.title}&rdquo; will be permanently removed
-              from the repository. This action cannot be undone.
+              from the repository, including all supporting documents. This action cannot be undone.
             </p>
             <div className="modal-actions">
               <button

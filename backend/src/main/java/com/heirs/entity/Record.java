@@ -18,6 +18,9 @@ import java.time.ZoneOffset;
       @Index(name = "idx_records_department", columnList = "department")
     })
 public class Record {
+  @OneToMany(mappedBy = "record", fetch = FetchType.LAZY)
+  private java.util.List<Document> documents = new java.util.ArrayList<>();
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
