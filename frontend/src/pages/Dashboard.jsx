@@ -13,6 +13,8 @@ import { useRecords } from '../context/RecordsContext';
 import { SearchBar } from '../components/SearchBar';
 import { CategoryCard } from '../components/CategoryCard';
 import { RecordCard } from '../components/RecordCard';
+import { LoadingState, InlineError, CardSkeletons } from '../components/DataState';
+import { EmptyState } from '../components/EmptyState';
 import { CATEGORY_ICONS, CATEGORY_DESCRIPTIONS } from '../data/mockCategories';
 import {
   getCategoryCounts,
@@ -21,7 +23,7 @@ import {
 import '../App.css';
 
 export default function Dashboard() {
-  const { records, recentSearches } = useRecords();
+  const { records, loading, error, categoriesLoading, retry, recentSearches } = useRecords();
 
   const total = records.length;
   const categoryCounts = getCategoryCounts(records);
@@ -60,6 +62,13 @@ export default function Dashboard() {
         </div>
       </section>
 
+      {error && (
+        <InlineError
+          message="Unable to load records. Please check the backend connection."
+          onRetry={retry}
+        />
+      )}
+
       <section aria-labelledby="metrics-heading">
         <div className="section-heading">
           <h2 id="metrics-heading" className="section-heading-title">
@@ -73,8 +82,17 @@ export default function Dashboard() {
                 <Icon className="metric-icon" />
               </div>
               <div className="metric-data">
-                <div className="metric-value">{value}</div>
-                <div className="metric-label">{label}</div>
+                {loading ? (
+                  <>
+                    <div className="skeleton-block skeleton-metric-value" />
+                    <div className="skeleton-block skeleton-metric-label" />
+                  </>
+                ) : (
+                  <>
+                    <div className="metric-value">{value}</div>
+                    <div className="metric-label">{label}</div>
+                  </>
+                )}
               </div>
             </div>
           ))}
@@ -90,11 +108,25 @@ export default function Dashboard() {
             View all <ArrowRight className="btn-icon" aria-hidden="true" />
           </Link>
         </div>
-        <div className="results-grid">
-          {recentRecords.map((record) => (
-            <RecordCard key={record.id} record={record} />
-          ))}
-        </div>
+        {loading ? (
+          <CardSkeletons count={3} />
+        ) : error ? (
+          <div className="results-grid">
+            <InlineError message="Recent records are unavailable while the backend is offline." onRetry={retry} />
+          </div>
+        ) : recentRecords.length > 0 ? (
+          <div className="results-grid">
+            {recentRecords.map((record) => (
+              <RecordCard key={record.id} record={record} />
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            icon="Inbox"
+            title="No records found"
+            description="The repository has no records yet. Add a record from the Manage Records page."
+          />
+        )}
       </section>
 
       <section className="section-zone zone-mist" aria-labelledby="category-heading">
@@ -106,17 +138,21 @@ export default function Dashboard() {
             View all categories <ArrowRight className="btn-icon" aria-hidden="true" />
           </Link>
         </div>
-        <div className="grid grid-5">
-          {quickCategories.map(({ key, count }) => (
-            <CategoryCard
-              key={key}
-              icon={CATEGORY_ICONS[key]}
-              category={key}
-              count={count}
-              description={CATEGORY_DESCRIPTIONS[key]}
-            />
-          ))}
-        </div>
+        {categoriesLoading ? (
+          <LoadingState label="Loading categories..." compact />
+        ) : (
+          <div className="grid grid-5">
+            {quickCategories.map(({ key, count }) => (
+              <CategoryCard
+                key={key}
+                icon={CATEGORY_ICONS[key]}
+                category={key}
+                count={count}
+                description={CATEGORY_DESCRIPTIONS[key]}
+              />
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="section-zone zone-gray" aria-labelledby="recent-searches-heading">

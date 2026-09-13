@@ -1,0 +1,68 @@
+@baseUrl = http://127.0.0.1:8080
+
+### Database readiness
+GET {{baseUrl}}/api/health
+
+### Records
+GET {{baseUrl}}/api/records
+
+### Record detail
+GET {{baseUrl}}/api/records/1
+
+### Categories
+GET {{baseUrl}}/api/categories
+
+### Keyword
+GET {{baseUrl}}/api/records/search?q=policy
+
+### Category
+GET {{baseUrl}}/api/records/search?category=Policy
+
+### Status
+GET {{baseUrl}}/api/records/search?status=Active
+
+### Year
+GET {{baseUrl}}/api/records/search?year=2026
+
+### Combined search
+GET {{baseUrl}}/api/records/search?q=digital&category=Policy&status=Active
+
+### Pagination
+GET {{baseUrl}}/api/records?page=0&size=1
+
+### Create a disposable example; copy its returned id into the requests below
+POST {{baseUrl}}/api/records
+Content-Type: application/json
+
+{
+  "title": "Example Student Research Scheme",
+  "category": "Scheme",
+  "department": "Student Welfare",
+  "referenceNumber": "EXAMPLE/SCH/2026/001",
+  "publicationYear": 2026,
+  "status": "Draft",
+  "keywords": "research,students"
+}
+
+### Replace created example (set createdId first)
+@createdId = 0
+PUT {{baseUrl}}/api/records/{{createdId}}
+Content-Type: application/json
+
+{
+  "title": "Revised Student Research Scheme",
+  "category": "Scheme",
+  "department": "Student Welfare",
+  "referenceNumber": "EXAMPLE/SCH/2026/001",
+  "publicationYear": 2026,
+  "status": "Active"
+}
+
+### Delete created example
+DELETE {{baseUrl}}/api/records/{{createdId}}
+
+### Validation
+POST {{baseUrl}}/api/records
+Content-Type: application/json
+
+{}

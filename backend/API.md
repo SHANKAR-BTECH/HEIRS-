@@ -1,0 +1,181 @@
+# HEIRS REST contract ? phase 2
+
+Base URL: `http://127.0.0.1:8080`. JSON requests use `Content-Type: application/json`. This contract applies equally to React and JavaFX. No authentication or cookies are required in this local foundation.
+
+## Record response
+
+GET `/api/records/{id}` returns HTTP 200 with exactly these fields:
+
+```json
+{
+  "id": 1,
+  "title": "National Digital Learning Policy for Higher Education",
+  "description": "Framework for improving digital infrastructure, blended learning and institutional digital readiness across universities and colleges.",
+  "category": "Policy",
+  "department": "Higher Education Department",
+  "referenceNumber": "HEIRS/POL/2026/014",
+  "publicationYear": 2026,
+  "publishedDate": "2026-03-12",
+  "status": "Active",
+  "source": "Higher Education Department",
+  "keywords": "Digital Learning,Universities,Infrastructure,Blended Learning"
+}
+```
+
+`id` is a positive generated integer, not the mock catalogue's string ID. `publishedDate` is an ISO `YYYY-MM-DD` date without a timezone. `keywords` is a comma-separated string, not an array. Optional fields are returned as `null` when absent. There is no JPA metadata, audit timestamps, or document upload information in this response.
+
+## List and search
+
+GET `/api/records` supports `page` and `size`. GET `/api/records/search` supports all parameters below. Query parameters have no request body.
+
+| Parameter | Type/default | Rules |
+|---|---|---|
+| `q` | optional string | Max 500 characters; trimmed, case-insensitive substring across title, description, keywords, department, referenceNumber |
+| `category` | optional enum | Policy, Scheme, Regulation, Project, Rules |
+| `year` | optional integer | 1900?2100 inclusive; filters `publicationYear` |
+| `status` | optional enum | Active, Draft, Completed, Archived |
+| `department` | optional string | Max 150 characters; trimmed case-insensitive exact match |
+| `page` | integer, `0` | Zero-based, minimum 0 |
+| `size` | integer, `20` | 1?100 inclusive |
+
+All search parameters are optional and combine with AND; `q` matches any of the five fields. Blank `q` and department values are ignored. Omit unused enum and year parameters. Enum inputs accept display labels or uppercase codes, ignoring case; responses always use the display labels. `%` and `_` in keywords are literal, not wildcard syntax. URL-encode parameter values. Unknown filter names do not define additional filters.
+
+Example: `/api/records/search?q=digital&category=Policy&year=2026&status=Active&page=0&size=20`.
+
+Both endpoints return HTTP 200 with the same stable envelope. This complete one-item example corresponds to `/api/records?page=0&size=1` immediately after seeding:
+
+```json
+{
+  "content": [
+    {
+      "id": 1,
+      "title": "National Digital Learning Policy for Higher Education",
+      "description": "Framework for improving digital infrastructure, blended learning and institutional digital readiness across universities and colleges.",
+      "category": "Policy",
+      "department": "Higher Education Department",
+      "referenceNumber": "HEIRS/POL/2026/014",
+      "publicationYear": 2026,
+      "publishedDate": "2026-03-12",
+      "status": "Active",
+      "source": "Higher Education Department",
+      "keywords": "Digital Learning,Universities,Infrastructure,Blended Learning"
+    }
+  ],
+  "page": 0,
+  "size": 1,
+  "totalElements": 60,
+  "totalPages": 60,
+  "first": true,
+  "last": false
+}
+```
+
+Results are sorted by ascending `id`. `totalElements` counts matches before pagination. No matches return `content: []`, `totalElements: 0`, and `totalPages: 0`. A page past the end returns an empty content array with the actual totals. Clients read `response.content`, not a top-level record array. Pages can shift if records change between requests.
+
+## Create and update
+
+POST `/api/records` creates a record. PUT `/api/records/{id}` fully replaces an existing record. Both accept the same body shape (separate request DTOs):
+
+```json
+{
+  "title": "New Student Research Scheme",
+  "description": "Research support for eligible students.",
+  "category": "Scheme",
+  "department": "Student Welfare",
+  "referenceNumber": "SW/SCH/2026/NEW-001",
+  "publicationYear": 2026,
+  "publishedDate": "2026-09-13",
+  "status": "Draft",
+  "source": null,
+  "keywords": "research,students"
+}
+```
+
+| Field | Required | Validation |
+|---|---|---|
+| title | Yes | Nonblank, max 255 characters |
+| description | No | Max 20,000 characters, nullable |
+| category | Yes | Known category enum |
+| department | Yes | Nonblank, max 150 characters |
+| referenceNumber | Yes | Nonblank, max 100 characters, database unique |
+| publicationYear | No | Integer 1900?2100, nullable |
+| publishedDate | No | Valid ISO date, nullable |
+| status | Yes | Known status enum |
+| source | No | Max 500 characters, nullable; free text, not forced to be a URL |
+| keywords | No | Max 2,000 characters, nullable string |
+
+Title, department, and reference number are trimmed before persistence. Required fields must be supplied on PUT. Omitted optional fields become null; PUT is not a partial update. Clients must not send `id`, timestamps, or unknown JSON fields. Numeric enum values are rejected. No automatic category classification, reference generation, or relationship between publication year and date is imposed.
+
+POST returns HTTP **201**, a `Location` header pointing to `/api/records/{newId}`, and the full record response. PUT returns HTTP **200** and the full updated record. Explicit reference corrections are allowed if unique; the backend never regenerates references. A missing PUT target is **404**; duplicate references on either operation are **409**, including database-detected concurrent conflicts.
+
+## Delete
+
+DELETE `/api/records/{id}` has no body. Returns **204 No Content** on success, or **404** if the record does not exist (including repeated deletion).
+
+## Categories
+
+GET `/api/categories` returns HTTP 200:
+
+```json
+[
+  {"code":"POLICY","name":"Policy"},
+  {"code":"SCHEME","name":"Scheme"},
+  {"code":"REGULATION","name":"Regulation"},
+  {"code":"PROJECT","name":"Project"},
+  {"code":"RULES","name":"Rules"}
+]
+```
+
+## Health
+
+GET `/api/health` opens and validates a database connection. HTTP **200**:
+
+```json
+{"status":"UP","database":"UP"}
+```
+
+If the database is unavailable: HTTP **503**, `{"status":"DOWN","database":"DOWN"}`. Health is a readiness contract and uses this status body rather than the application error envelope. Initial startup also requires a reachable database.
+
+## Errors
+
+Application errors use this shape (timestamp is an ISO UTC instant):
+
+```json
+{
+  "timestamp": "2026-09-13T07:00:00Z",
+  "status": 404,
+  "error": "Not Found",
+  "message": "Record with id 42 was not found",
+  "path": "/api/records/42",
+  "fieldErrors": {}
+}
+```
+
+Validation example:
+
+```json
+{
+  "timestamp": "2026-09-13T07:00:00Z",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Request validation failed",
+  "path": "/api/records",
+  "fieldErrors": {
+    "title": "Title is required",
+    "referenceNumber": "Reference number is required"
+  }
+}
+```
+
+`fieldErrors` maps invalid input names to messages and is empty for errors without field details. Treat `status` and field names as structured data; messages are intended for humans.
+
+| Status | Meaning |
+|---|---|
+| 400 | Bean Validation failure, invalid query types/enums, malformed JSON/date, unknown body fields |
+| 404 | Missing record or endpoint |
+| 405 | Unsupported HTTP method |
+| 409 | Duplicate reference or database constraint conflict |
+| 415 | Unsupported request content type |
+| 500 | Unexpected error; details logged server-side, generic public message |
+
+CORS preflight rejection is handled by Spring's CORS filter (403); it is not an application JSON error. Both local Vite origins are allowed, with GET/POST/PUT/DELETE/OPTIONS and exposed `Location`. JavaFX uses ordinary HTTP without browser CORS enforcement.

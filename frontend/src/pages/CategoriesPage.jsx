@@ -8,10 +8,14 @@ import {
   CATEGORY_ICONS,
 } from '../data/mockCategories';
 import { getRecentRecords, normalizeCategory } from '../lib/searchUtils';
+import { LoadingState, InlineError } from '../components/DataState';
 import '../App.css';
 
 export default function CategoriesPage() {
-  const { records } = useRecords();
+  const { records, categories, loading, categoriesLoading, error, categoriesError, retry } =
+    useRecords();
+
+  const categoryKeys = categories.length ? categories : CATEGORY_KEYS;
 
   const categorySummary = useMemo(() => {
     const counts = new Map();
@@ -19,7 +23,7 @@ export default function CategoriesPage() {
       const key = normalizeCategory(record.category);
       counts.set(key, (counts.get(key) || 0) + 1);
     });
-    return CATEGORY_KEYS.map((key) => ({
+    return categoryKeys.map((key) => ({
       key,
       count: counts.get(key) || 0,
       recent: getRecentRecords(
@@ -27,7 +31,7 @@ export default function CategoriesPage() {
         3
       ),
     }));
-  }, [records]);
+  }, [records, categoryKeys]);
 
   return (
     <div className="page-stack">
@@ -39,52 +43,71 @@ export default function CategoriesPage() {
         </p>
       </div>
 
-      <div className="category-list section-zone zone-mist">
-        {categorySummary.map(({ key, count, recent }) => {
-          const Icon = CATEGORY_ICONS[key];
-          return (
-            <article key={key} className={`category-panel ${key.toLowerCase()}`}>
-              <div className="category-panel-head">
-                <div className="category-icon-square">
-                  <Icon className="category-icon" aria-hidden="true" />
-                </div>
-                <div className="category-panel-title">
-                  <h2 className="category-name">{key}</h2>
-                  <p className="category-description">{CATEGORY_DESCRIPTIONS[key]}</p>
-                </div>
-                <span className="category-count-badge">{count} records</span>
-              </div>
+      {error && (
+        <InlineError
+          message="Unable to load records. Please check the backend connection."
+          onRetry={retry}
+        />
+      )}
 
-              {recent.length > 0 && (
-                <div className="category-recent">
-                  <p className="category-recent-label">Recent records</p>
-                  <ul className="category-recent-list">
-                    {recent.map((record) => (
-                      <li key={record.id}>
-                        <Link
-                          className="category-recent-item"
-                          to={`/records/${record.id}`}
-                        >
-                          <span className="recent-item-title">{record.title}</span>
-                          <span className="recent-item-ref">{record.referenceNumber}</span>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
+      {categoriesLoading ? (
+        <LoadingState label="Loading categories..." />
+      ) : (
+        <div className="category-list section-zone zone-mist">
+          {categorySummary.map(({ key, count, recent }) => {
+            const Icon = CATEGORY_ICONS[key];
+            if (!Icon) return null;
+            return (
+              <article key={key} className={`category-panel ${key.toLowerCase()}`}>
+                <div className="category-panel-head">
+                  <div className="category-icon-square">
+                    <Icon className="category-icon" aria-hidden="true" />
+                  </div>
+                  <div className="category-panel-title">
+                    <h2 className="category-name">{key}</h2>
+                    <p className="category-description">{CATEGORY_DESCRIPTIONS[key]}</p>
+                  </div>
+                  <span className="category-count-badge">{count} records</span>
                 </div>
-              )}
 
-              <Link
-                className="btn btn-secondary"
-                to={`/search?category=${encodeURIComponent(key)}`}
-              >
-                Browse {key}
-                <ArrowRight className="btn-icon" aria-hidden="true" />
-              </Link>
-            </article>
-          );
-        })}
-      </div>
+                {recent.length > 0 && (
+                  <div className="category-recent">
+                    <p className="category-recent-label">Recent records</p>
+                    <ul className="category-recent-list">
+                      {recent.map((record) => (
+                        <li key={record.id}>
+                          <Link
+                            className="category-recent-item"
+                            to={`/records/${record.id}`}
+                          >
+                            <span className="recent-item-title">{record.title}</span>
+                            <span className="recent-item-ref">{record.referenceNumber}</span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <Link
+                  className="btn btn-secondary"
+                  to={`/search?category=${encodeURIComponent(key)}`}
+                >
+                  Browse {key}
+                  <ArrowRight className="btn-icon" aria-hidden="true" />
+                </Link>
+              </article>
+            );
+          })}
+        </div>
+      )}
+
+      {!categoriesLoading && !error && !loading && categoriesError && (
+        <InlineError
+          message="Category data could not be refreshed."
+          onRetry={retry}
+        />
+      )}
     </div>
   );
 }

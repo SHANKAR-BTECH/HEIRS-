@@ -1,27 +1,27 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
-import { mockRecords } from '../data/mockRecords';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  getAllRecords,
+  getCategories,
+  createRecord,
+  updateRecord as updateRecordApi,
+  deleteRecord as deleteRecordApi,
+} from '../api/recordsApi';
 
-// Frontend-only record store. Mirrors the future Spring Boot CRUD contract
-// (GET/POST/PUT/DELETE /api/records) using local state for the prototype.
+// API-backed record store. All runtime data comes from the Spring Boot
+// backend; local state is refreshed cache that pages render.
 const RecordsContext = createContext(null);
 
-function generateId(record) {
-  const prefixMap = {
-    Regulation: 'reg',
-    Policy: 'pol',
-    Project: 'pro',
-    Rules: 'rul',
-    Scheme: 'sch',
-  };
-  const kind = prefixMap[record.category] || 'rec';
-  return `${kind}-${Date.now().toString(36)}`;
-}
-
 export function RecordsProvider({ children }) {
-  const [records, setRecords] = useState(mockRecords);
+  const [records, setRecords] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [categoriesError, setCategoriesError] = useState(null);
   const [recentSearches, setRecentSearches] = useState([]);
+
   const rememberSearch = useCallback((value) => {
-    const query = value.trim();
+    const query = String(value || '').trim();
     if (query) {
       setRecentSearches((previous) =>
         [query, ...previous.filter((item) => item !== query)].slice(0, 5)
@@ -29,26 +29,97 @@ export function RecordsProvider({ children }) {
     }
   }, []);
 
+  const loadRecords = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { records: loaded } = await getAllRecords();
+      setRecords(loaded);
+      return loaded;
+    } catch (loadError) {
+      setError(loadError);
+      setRecords([]);
+      throw loadError;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const loadCategories = useCallback(async () => {
+    setCategoriesLoading(true);
+    setCategoriesError(null);
+    try {
+      const items = await getCategories();
+      setCategories(items.map((item) => item.name).filter(Boolean));
+      return items;
+    } catch (loadError) {
+      setCategoriesError(loadError);
+      setCategories([]);
+      throw loadError;
+    } finally {
+      setCategoriesLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadRecords().catch(() => {});
+    loadCategories().catch(() => {});
+  }, [loadRecords, loadCategories]);
+
+  const retry = useCallback(() => {
+    return Promise.all([loadRecords(), loadCategories()]).then(() => undefined);
+  }, [loadRecords, loadCategories]);
+
+  const addRecord = useCallback(async (payload) => {
+    const created = await createRecord(payload);
+    setRecords((prev) => [created, ...prev]);
+    return created;
+  }, []);
+
+  const updateRecord = useCallback(async (id, payload) => {
+    const updated = await updateRecordApi(id, payload);
+    setRecords((prev) =>
+      prev.map((record) => (record.id === id ? updated : record))
+    );
+    return updated;
+  }, []);
+
+  const deleteRecord = useCallback(async (id) => {
+    await deleteRecordApi(id);
+    setRecords((prev) => prev.filter((record) => record.id !== id));
+  }, []);
+
   const value = useMemo(
     () => ({
       records,
+      categories,
+      loading,
+      categoriesLoading,
+      error,
+      categoriesError,
       recentSearches,
       rememberSearch,
-      addRecord: (record) =>
-        setRecords((prev) => [
-          { ...record, id: record.id || generateId(record) },
-          ...prev,
-        ]),
-      updateRecord: (id, updates) =>
-        setRecords((prev) =>
-          prev.map((record) =>
-            record.id === id ? { ...record, ...updates } : record
-          )
-        ),
-      deleteRecord: (id) =>
-        setRecords((prev) => prev.filter((record) => record.id !== id)),
+      refresh: loadRecords,
+      retry,
+      addRecord,
+      updateRecord,
+      deleteRecord,
     }),
-    [records, recentSearches, rememberSearch]
+    [
+      records,
+      categories,
+      loading,
+      categoriesLoading,
+      error,
+      categoriesError,
+      recentSearches,
+      rememberSearch,
+      loadRecords,
+      retry,
+      addRecord,
+      updateRecord,
+      deleteRecord,
+    ]
   );
 
   return (

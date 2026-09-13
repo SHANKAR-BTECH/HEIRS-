@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -16,8 +16,9 @@ import { useRecords } from '../context/RecordsContext';
 import { StatusBadge } from '../components/StatusBadge';
 import { EmptyState } from '../components/EmptyState';
 import { RecordCard } from '../components/RecordCard';
+import { LoadingState, InlineError } from '../components/DataState';
+import { getRecordById as getRecordByIdApi } from '../api/recordsApi';
 import {
-  getRecordById,
   getRelatedRecords,
   getKeyInformation,
   getDocuments,
@@ -29,8 +30,97 @@ export default function RecordDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { records } = useRecords();
+  const [record, setRecord] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const requestIdRef = useRef(0);
 
-  const record = useMemo(() => getRecordById(records, id), [records, id]);
+  useEffect(() => {
+    const requestId = ++requestIdRef.current;
+    setLoading(true);
+    setError(null);
+    setRecord(null);
+    getRecordByIdApi(id)
+      .then((loaded) => {
+        if (requestId !== requestIdRef.current) return;
+        setRecord(loaded);
+      })
+      .catch((loadError) => {
+        if (requestId !== requestIdRef.current) return;
+        setError(loadError);
+      })
+      .finally(() => {
+        if (requestId === requestIdRef.current) {
+          setLoading(false);
+        }
+      });
+  }, [id]);
+
+  const retry = () => {
+    const requestId = ++requestIdRef.current;
+    setLoading(true);
+    setError(null);
+    getRecordByIdApi(id)
+      .then((loaded) => {
+        if (requestId !== requestIdRef.current) return;
+        setRecord(loaded);
+      })
+      .catch((loadError) => {
+        if (requestId !== requestIdRef.current) return;
+        setError(loadError);
+      })
+      .finally(() => {
+        if (requestId === requestIdRef.current) {
+          setLoading(false);
+        }
+      });
+  };
+
+  const related = useMemo(
+    () => (record ? getRelatedRecords(records, record, 3) : []),
+    [records, record]
+  );
+
+  if (loading) {
+    return (
+      <div className="page-stack">
+        <div className="content-header">
+          <h1 className="content-title">Record Details</h1>
+          <p className="content-subtitle">Loading the selected record...</p>
+        </div>
+        <LoadingState label="Loading record..." />
+      </div>
+    );
+  }
+
+  if (error && (error.status === 404 || error.status === 400)) {
+    return (
+      <div className="page-stack">
+        <EmptyState
+          icon="FileX2"
+          title="Record not found"
+          description="The record you are looking for does not exist or may have been removed."
+          actionLabel="Back to Search"
+          onAction={() => navigate('/search')}
+        />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page-stack">
+        <div className="content-header">
+          <h1 className="content-title">Record Details</h1>
+          <p className="content-subtitle">This record could not be loaded.</p>
+        </div>
+        <InlineError
+          message="Unable to load this record. Please check the backend connection."
+          onRetry={retry}
+        />
+      </div>
+    );
+  }
 
   if (!record) {
     return (
@@ -49,7 +139,6 @@ export default function RecordDetailsPage() {
   const category = normalizeCategory(record.category);
   const keyInfo = getKeyInformation(record);
   const documents = getDocuments(record);
-  const related = getRelatedRecords(records, record, 3);
 
   const metadata = [
     { label: 'Reference Number', value: record.referenceNumber, icon: Hash },

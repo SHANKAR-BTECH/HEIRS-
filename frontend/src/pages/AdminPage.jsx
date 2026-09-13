@@ -18,6 +18,34 @@ const EMPTY_FORM = {
   keywords: '',
 };
 
+function buildPayload(form) {
+  return {
+    title: form.title.trim(),
+    description: form.description.trim(),
+    category: form.category,
+    department: form.department,
+    referenceNumber: form.referenceNumber.trim(),
+    publicationYear: Number(form.publicationYear),
+    publishedDate: form.publishedDate?.trim() || null,
+    status: form.status,
+    source: form.source?.trim() || null,
+    keywords: (form.keywords || '')
+      .split(',')
+      .map((keyword) => keyword.trim())
+      .filter(Boolean)
+      .join(', '),
+  };
+}
+
+function extractErrorMessage(error) {
+  if (error?.fieldErrors && Object.keys(error.fieldErrors).length) {
+    return Object.entries(error.fieldErrors)
+      .map(([field, message]) => `${field}: ${message}`)
+      .join('. ');
+  }
+  return error?.message || 'The request could not be completed.';
+}
+
 export default function AdminPage() {
   const { records, addRecord, updateRecord, deleteRecord } = useRecords();
   const navigate = useNavigate();
@@ -26,7 +54,9 @@ export default function AdminPage() {
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [formError, setFormError] = useState('');
+  const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
   const [toast, setToast] = useState('');
   const modalFocusRef = useRef(null);
   const lastActiveRef = useRef(null);
@@ -52,9 +82,9 @@ export default function AdminPage() {
       department: record.department,
       referenceNumber: record.referenceNumber,
       publicationYear: record.publicationYear,
-      publishedDate: record.publishedDate,
+      publishedDate: record.publishedDate || '',
       status: record.status,
-      source: record.source,
+      source: record.source || '',
       keywords: (record.keywords || []).join(', '),
     });
     setFormError('');
@@ -82,39 +112,44 @@ export default function AdminPage() {
     return '';
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    const error = validate();
-    if (error) {
-      setFormError(error);
+    const clientError = validate();
+    if (clientError) {
+      setFormError(clientError);
       return;
     }
-    const payload = {
-      ...form,
-      title: form.title.trim(),
-      description: form.description.trim(),
-      referenceNumber: form.referenceNumber.trim(),
-      source: form.source.trim() || form.department,
-      keywords: (form.keywords || '')
-        .split(',')
-        .map((keyword) => keyword.trim())
-        .filter(Boolean),
-    };
-    if (editingId) {
-      updateRecord(editingId, payload);
-      showToast('Record updated.');
-    } else {
-      addRecord(payload);
-      showToast('Record added.');
+    const payload = buildPayload(form);
+    setSaving(true);
+    setFormError('');
+    try {
+      if (editingId) {
+        await updateRecord(editingId, payload);
+        showToast('Record updated.');
+      } else {
+        await addRecord(payload);
+        showToast('Record added.');
+      }
+      setModalOpen(false);
+    } catch (saveError) {
+      setFormError(extractErrorMessage(saveError));
+    } finally {
+      setSaving(false);
     }
-    setModalOpen(false);
   };
 
-  const confirmDelete = () => {
-    if (deleteTarget) {
-      deleteRecord(deleteTarget.id);
+  const confirmDelete = async () => {
+    if (!deleteTarget || deleting) return;
+    setDeleting(true);
+    try {
+      await deleteRecord(deleteTarget.id);
       showToast('Record deleted.');
       setDeleteTarget(null);
+    } catch (deleteError) {
+      showToast(`Delete failed: ${extractErrorMessage(deleteError)}`);
+      setDeleteTarget(null);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -181,7 +216,7 @@ export default function AdminPage() {
       </div>
 
       <div className="admin-note" role="note">
-        Preview: changes last for this session and reset when you reload.
+        Changes are saved to the repository database and persist after reload.
       </div>
 
       <div className="card table-card">
@@ -434,11 +469,16 @@ export default function AdminPage() {
                   type="button"
                   className="btn btn-secondary"
                   onClick={() => setModalOpen(false)}
+                  disabled={saving}
                 >
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary">
-                  {editingId ? 'Save Changes' : 'Add Record'}
+                <button type="submit" className="btn btn-primary" disabled={saving}>
+                  {saving
+                    ? 'Saving...'
+                    : editingId
+                    ? 'Save Changes'
+                    : 'Add Record'}
                 </button>
               </div>
             </form>
@@ -462,19 +502,25 @@ export default function AdminPage() {
               Delete record?
             </h3>
             <p className="confirm-text">
-              &ldquo;{deleteTarget.title}&rdquo; will be removed from the local
-              record store. This action cannot be undone in prototype mode.
+              &ldquo;{deleteTarget.title}&rdquo; will be permanently removed
+              from the repository. This action cannot be undone.
             </p>
             <div className="modal-actions">
               <button
                 type="button"
                 className="btn btn-secondary"
                 onClick={() => setDeleteTarget(null)}
+                disabled={deleting}
               >
                 Cancel
               </button>
-              <button type="button" className="btn btn-danger" onClick={confirmDelete}>
-                Delete Record
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={confirmDelete}
+                disabled={deleting}
+              >
+                {deleting ? 'Deleting...' : 'Delete Record'}
               </button>
             </div>
           </div>

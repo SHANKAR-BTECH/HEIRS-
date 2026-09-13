@@ -10,12 +10,13 @@ import {
 } from 'lucide-react';
 import { useRecords } from '../context/RecordsContext';
 import { StatusBadge } from '../components/StatusBadge';
+import { LoadingState, InlineError } from '../components/DataState';
 import { buildReportSummary } from '../data/mockReports';
 import { buildCsv } from '../lib/searchUtils';
 import '../App.css';
 
 export default function ReportsPage() {
-  const { records } = useRecords();
+  const { records, loading, error, retry } = useRecords();
   const [exported, setExported] = useState(false);
 
   const report = useMemo(() => buildReportSummary(records), [records]);
@@ -23,6 +24,37 @@ export default function ReportsPage() {
     () => Math.max(...report.byCategory.map((entry) => entry.count), 1),
     [report]
   );
+
+  if (loading) {
+    return (
+      <div className="page-stack">
+        <div className="content-header report-header">
+          <div>
+            <h2 className="content-title">Reports</h2>
+            <p className="content-subtitle">Loading report statistics...</p>
+          </div>
+        </div>
+        <LoadingState label="Loading report data..." />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page-stack">
+        <div className="content-header report-header">
+          <div>
+            <h2 className="content-title">Reports</h2>
+            <p className="content-subtitle">Report statistics could not be loaded.</p>
+          </div>
+        </div>
+        <InlineError
+          message="Unable to load report data. Please check the backend connection."
+          onRetry={retry}
+        />
+      </div>
+    );
+  }
 
   const handleExport = () => {
     const csv = buildCsv(records);
@@ -174,19 +206,32 @@ function ReportStat({ icon: Icon, label, value, hint }) {
   );
 }
 
+const CATEGORY_COLOR_MAP = {
+  Policy: '#566AA3',
+  Scheme: '#8A6FAE',
+  Regulation: '#6B5B95',
+  Project: '#4E7A73',
+  Rules: '#A06D45',
+  Rule: '#A06D45',
+};
+
+const DEFAULT_BAR_PALETTE = ['#566AA3', '#8A6FAE', '#6B5B95', '#4E7A73', '#A06D45'];
+
 function BarDistribution({ items, max }) {
-  const palette = ['#192A51', '#967AA1', '#AAA1C8', '#D5C6E0', '#8A4A63'];
   return (
     <ul className="bar-distribution">
       {items.map((entry, index) => {
         const width = Math.round((entry.count / max) * 100);
+        const color =
+          CATEGORY_COLOR_MAP[entry.label] ||
+          DEFAULT_BAR_PALETTE[index % DEFAULT_BAR_PALETTE.length];
         return (
           <li key={entry.label} className="bar-row">
             <span className="bar-label">{entry.label}</span>
             <div className="bar-track" role="img" aria-label={`${entry.label}: ${entry.count}`}>
               <div
                 className="bar-fill"
-                style={{ width: `${Math.max(width, 4)}%`, backgroundColor: palette[index % palette.length] }}
+                style={{ width: `${Math.max(width, 4)}%`, backgroundColor: color }}
               />
             </div>
             <span className="bar-count">{entry.count}</span>

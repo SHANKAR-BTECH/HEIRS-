@@ -1,18 +1,25 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search, SlidersHorizontal } from 'lucide-react';
 import { useRecords } from '../context/RecordsContext';
 import { FilterPanel } from '../components/FilterPanel';
 import { RecordCard } from '../components/RecordCard';
 import { EmptyState } from '../components/EmptyState';
-import { searchRecords, getDefaultFilters } from '../lib/searchUtils';
+import { LoadingState, InlineError, CardSkeletons } from '../components/DataState';
+import { searchRecords as searchRecordsApi } from '../api/recordsApi';
+import { getDefaultFilters } from '../lib/searchUtils';
 import '../App.css';
 
 export default function SearchPage() {
-  const { records, rememberSearch } = useRecords();
+  const { rememberSearch } = useRecords();
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState('');
   const [filters, setFilters] = useState(getDefaultFilters());
+  const [results, setResults] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const requestIdRef = useRef(0);
 
   useEffect(() => {
     const fromUrl = searchParams.get('q') || '';
@@ -26,10 +33,49 @@ export default function SearchPage() {
     }));
   }, [searchParams, rememberSearch]);
 
-  const results = useMemo(
-    () => searchRecords(records, { ...filters, query }),
-    [records, query, filters]
-  );
+  const runSearch = useCallback(async (activeQuery, activeFilters) => {
+    const requestId = ++requestIdRef.current;
+    setLoading(true);
+    setError(null);
+    try {
+      const { records: items, total } = await searchRecordsApi({
+        q: activeQuery,
+        category: activeFilters.category,
+        year: activeFilters.year,
+        status: activeFilters.status,
+        department: activeFilters.department,
+      });
+      if (requestId !== requestIdRef.current) return;
+      setResults(items);
+      setTotalCount(total);
+    } catch (searchError) {
+      if (requestId !== requestIdRef.current) return;
+      setError(searchError);
+      setResults([]);
+      setTotalCount(0);
+    } finally {
+      if (requestId === requestIdRef.current) {
+        setLoading(false);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    const requestId = ++requestIdRef.current;
+    const timer = window.setTimeout(() => {
+      runSearch(query, filters);
+    }, 250);
+    return () => {
+      window.clearTimeout(timer);
+      if (requestId === requestIdRef.current) {
+        requestIdRef.current += 1;
+      }
+    };
+  }, [query, filters, runSearch]);
+
+  const retrySearch = () => {
+    runSearch(query, filters);
+  };
 
   const pushQuery = (q) => {
     const params = new URLSearchParams();
@@ -60,6 +106,8 @@ export default function SearchPage() {
     setFilters(getDefaultFilters());
     setSearchParams({});
   };
+
+  const resultWord = totalCount === 1 ? 'record' : 'records';
 
   return (
     <div className="page-stack">
@@ -94,10 +142,15 @@ export default function SearchPage() {
 
       <div className="results-info">
         <h2 className="sr-only">Search results</h2>
-        <p className="results-count" role="status">
-          <strong>{results.length}</strong>{' '}
-          {results.length === 1 ? 'record' : 'records'} found
-        </p>
+        {loading ? (
+          <p className="results-count" role="status">
+            Loading results...
+          </p>
+        ) : (
+          <p className="results-count" role="status">
+            <strong>{totalCount}</strong> {resultWord} found
+          </p>
+        )}
         <div className="results-tools">
           {query && (
             <span className="result-hint">
@@ -117,20 +170,34 @@ export default function SearchPage() {
         </div>
       </div>
 
-      {results.length === 0 ? (
-        <EmptyState
-          icon="SearchX"
-          title="No matching records found"
-          description="Try broader keywords, removing a few filters, or checking the spelling of your search term."
-          actionLabel="Clear all filters"
-          onAction={clearAll}
+      {error ? (
+        <InlineError
+          message="Unable to load records. Please check the backend connection."
+          onRetry={retrySearch}
         />
+      ) : loading && results.length === 0 ? (
+        <CardSkeletons count={3} />
       ) : (
-        <div className="results-grid section-zone zone-lavender">
-          {results.map((record) => (
-            <RecordCard key={record.id} record={record} />
-          ))}
-        </div>
+        <>
+          {loading && results.length > 0 && (
+            <LoadingState label="Updating results..." compact />
+          )}
+          {results.length === 0 ? (
+            <EmptyState
+              icon="SearchX"
+              title="No matching records found"
+              description="Try broader keywords, removing a few filters, or checking the spelling of your search term."
+              actionLabel="Clear all filters"
+              onAction={clearAll}
+            />
+          ) : (
+            <div className="results-grid section-zone zone-lavender">
+              {results.map((record) => (
+                <RecordCard key={record.id} record={record} />
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
