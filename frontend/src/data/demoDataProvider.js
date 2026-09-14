@@ -20,40 +20,85 @@ let documents = null;
 // working after a page refresh, which is why they are session-only.
 const sessionUrls = new Map();
 
-// Load demo documents with a v1 → v2 migration.  Browsers that visited the
-// deployed site before this fix may already have a valid but incomplete
-// `heirs_demo_documents_v1` key.  We preserve any user-uploaded document
-// metadata from that legacy key (identified by ID not matching the bundled
-// set) and merge it with the current bundled defaults into v2.  The v1 key
-// is removed, and the merged set is persisted to v2, so this only runs once.
+// Bundled document IDs that shipped in the v1/v2 localStorage stores.  These
+// belong to the OLD bundled set (small, descriptive ids).  When migrating to
+// the v3 bundled set we must discard them rather than treating them as
+// user-created documents, otherwise stale copies of the old bundled docs
+// would linger next to the new ones.
+const LEGACY_BUNDLED_DOC_IDS = new Set([
+  'demo-doc-dlp-main',
+  'demo-doc-dlp-guidelines',
+  'demo-doc-dlp-annexure',
+  'demo-doc-skill-main',
+  'demo-doc-skill-amend1',
+  'demo-doc-skill-annex',
+  'demo-doc-scheme-guidelines',
+  'demo-doc-scheme-checklist',
+  'demo-doc-phd-guidelines',
+  'demo-doc-dlp2-main',
+  'demo-doc-dlp2-credit',
+  'demo-doc-dg-framework',
+  'demo-doc-dg-impl',
+  'demo-doc-placement-guidelines',
+  'demo-doc-merit-handbook',
+  'demo-doc-women-circular',
+]);
+
+// Load demo documents with a v3 migration chain: v3 -> v2 -> v1 -> defaults.
+//
+// Browsers that visited the deployed demo before this update may carry
+// `heirs_demo_documents_v2` (the previous full bundled set) or
+// `heirs_demo_documents_v1` (an even older, incomplete set).  We:
+//   - take the NEW v3 bundled defaults as the base,
+//   - preserve only genuine user-created document metadata from any stored
+//     legacy key (identified by NOT matching the new bundled ids and NOT
+//     matching the known legacy bundled ids),
+//   - persist the merged set to the v3 key,
+//   - and only then remove the obsolete legacy keys.
 function loadDemoDocuments() {
   const bundled = cloneDemoDocuments();
   const bundledIds = new Set(bundled.map((d) => d.id));
 
-  // Normal v2 load (may return null if key is missing or invalid).
+  // Normal v3 load (may return null if the key is missing or invalid).
   const stored = loadStored(STORAGE_KEYS.documents, null, isValidDemoDocument);
 
   let userDocs = [];
-  let shouldPersist = false;
+  let legacyKeysToRemove = [];
   if (Array.isArray(stored)) {
-    // Preserve user-created documents that are not part of the bundled set.
-    userDocs = stored.filter((d) => !bundledIds.has(d.id));
+    // v3 present: keep any user-created docs not in the bundled set.
+    userDocs = stored.filter((d) => isUserCreatedDocument(d, bundledIds));
   } else {
-    // One-time migration from v1 (only if v2 had no stored data).
-    shouldPersist = true;
-    const legacy = loadStored(STORAGE_KEYS.documentsLegacy, null, isValidDemoDocument);
-    if (Array.isArray(legacy)) {
-      userDocs = legacy.filter((d) => !bundledIds.has(d.id));
+    // One-time migration from legacy keys (only when v3 had no stored data).
+    const legacyV2 = loadStored(STORAGE_KEYS.documentsLegacyV2, null, isValidDemoDocument);
+    if (Array.isArray(legacyV2)) {
+      userDocs = legacyV2.filter((d) => isUserCreatedDocument(d, bundledIds));
+      legacyKeysToRemove.push(STORAGE_KEYS.documentsLegacyV2);
+    } else {
+      const legacyV1 = loadStored(STORAGE_KEYS.documentsLegacyV1, null, isValidDemoDocument);
+      if (Array.isArray(legacyV1)) {
+        userDocs = legacyV1.filter((d) => isUserCreatedDocument(d, bundledIds));
+        legacyKeysToRemove.push(STORAGE_KEYS.documentsLegacyV1);
+      }
+      legacyKeysToRemove.push(STORAGE_KEYS.documentsLegacyV2);
     }
-    // Clean up the legacy key.
-    try { window.localStorage.removeItem(STORAGE_KEYS.documentsLegacy); } catch { /* ignore */ }
   }
 
   const merged = [...bundled, ...userDocs];
-  if (shouldPersist) {
-    storeValue(STORAGE_KEYS.documents, merged);
+  // Persist to v3 before touching any legacy key.
+  storeValue(STORAGE_KEYS.documents, merged);
+  for (const key of legacyKeysToRemove) {
+    try { window.localStorage.removeItem(key); } catch { /* ignore */ }
   }
   return merged.map(cloneDemoDocument);
+}
+
+// A stored document counts as user-created (and therefore worth preserving)
+// only if it is neither part of the new bundled set nor part of the stale
+// legacy bundled set.
+function isUserCreatedDocument(document, bundledIds) {
+  if (bundledIds.has(document.id)) return false;
+  if (LEGACY_BUNDLED_DOC_IDS.has(document.id)) return false;
+  return true;
 }
 
 function ensureLoaded() {

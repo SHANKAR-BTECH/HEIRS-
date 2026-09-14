@@ -1,0 +1,3 @@
+# PDFs are binary artifacts. Never apply line-ending conversion, diffing,
+# or merge text rewriting to any PDF (corrupts xref byte offsets).
+*.pdf binary
