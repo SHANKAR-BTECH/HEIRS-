@@ -5,10 +5,12 @@ import {
   createRecord,
   updateRecord as updateRecordApi,
   deleteRecord as deleteRecordApi,
-} from '../api/recordsApi';
+  resetDemoData as resetDemoDataProvider,
+} from '../data/dataProvider';
 
-// API-backed record store. All runtime data comes from the Spring Boot
-// backend; local state is refreshed cache that pages render.
+// Record store fed by the active data provider. With VITE_DATA_MODE=api this
+// is a refresh cache over the Spring Boot backend; with VITE_DATA_MODE=demo it
+// is the per-browser localStorage demo store.
 const RecordsContext = createContext(null);
 
 export function RecordsProvider({ children }) {
@@ -89,6 +91,11 @@ export function RecordsProvider({ children }) {
     setRecords((prev) => prev.filter((record) => record.id !== id));
   }, []);
 
+  const resetDemoData = useCallback(async () => {
+    await resetDemoDataProvider();
+    await Promise.all([loadRecords(), loadCategories()]);
+  }, [loadRecords, loadCategories]);
+
   const value = useMemo(
     () => ({
       records,
@@ -104,6 +111,7 @@ export function RecordsProvider({ children }) {
       addRecord,
       updateRecord,
       deleteRecord,
+      resetDemoData,
     }),
     [
       records,
@@ -119,6 +127,7 @@ export function RecordsProvider({ children }) {
       addRecord,
       updateRecord,
       deleteRecord,
+      resetDemoData,
     ]
   );
 

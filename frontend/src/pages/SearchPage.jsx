@@ -6,7 +6,7 @@ import { FilterPanel } from '../components/FilterPanel';
 import { RecordCard } from '../components/RecordCard';
 import { EmptyState } from '../components/EmptyState';
 import { LoadingState, InlineError, CardSkeletons } from '../components/DataState';
-import { searchRecords as searchRecordsApi } from '../api/recordsApi';
+import { searchRecords as searchRecordsProvider } from '../data/dataProvider';
 import { getDefaultFilters } from '../lib/searchUtils';
 import '../App.css';
 
@@ -38,7 +38,7 @@ export default function SearchPage() {
     setLoading(true);
     setError(null);
     try {
-      const { records: items, total } = await searchRecordsApi({
+      const { records: items, total } = await searchRecordsProvider({
         q: activeQuery,
         category: activeFilters.category,
         year: activeFilters.year,

@@ -1,6 +1,10 @@
 .supporting-documents .document-item { flex-wrap: wrap; }
 .supporting-documents .document-info { min-width: 140px; }
 .document-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.supporting-documents .demo-unavailable {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
 .document-upload, .document-confirm { margin-top: 20px; }
 .document-upload .form-control { margin: 10px 0; max-width: 100%; }
 .selected-documents { margin: 10px 0 16px; padding-left: 20px; overflow-wrap: anywhere; }

@@ -16,7 +16,7 @@ import { SupportingDocuments } from '../components/SupportingDocuments';
 import { EmptyState } from '../components/EmptyState';
 import { RecordCard } from '../components/RecordCard';
 import { LoadingState, InlineError } from '../components/DataState';
-import { getRecordById as getRecordByIdApi } from '../api/recordsApi';
+import { getRecordById as getRecordByIdProvider } from '../data/dataProvider';
 import {
   getRelatedRecords,
   getKeyInformation,
@@ -38,7 +38,7 @@ export default function RecordDetailsPage() {
     setLoading(true);
     setError(null);
     setRecord(null);
-    getRecordByIdApi(id)
+    getRecordByIdProvider(id)
       .then((loaded) => {
         if (requestId !== requestIdRef.current) return;
         setRecord(loaded);
@@ -58,7 +58,7 @@ export default function RecordDetailsPage() {
     const requestId = ++requestIdRef.current;
     setLoading(true);
     setError(null);
-    getRecordByIdApi(id)
+    getRecordByIdProvider(id)
       .then((loaded) => {
         if (requestId !== requestIdRef.current) return;
         setRecord(loaded);

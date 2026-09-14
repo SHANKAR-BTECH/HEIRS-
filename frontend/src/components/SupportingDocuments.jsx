@@ -1,7 +1,14 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { FileText } from 'lucide-react';
 import { LoadingState, InlineError } from './DataState';
-import * as api from '../api/documentsApi';
+import {
+  getDocuments,
+  uploadDocuments as uploadDocumentsProvider,
+  replaceDocument as replaceDocumentProvider,
+  deleteDocument as deleteDocumentProvider,
+  getDocumentUrls,
+  isDemoMode,
+} from '../data/dataProvider';
 import './SupportingDocuments.css';
 
 function sizeLabel(bytes) {
@@ -23,10 +30,11 @@ export function SupportingDocuments({ recordId, editable = false, disabled = fal
   const replacementInput = useRef(null);
   const replacementId = useRef(null);
   const running = useRef(false);
+  const demoMode = isDemoMode();
 
   useEffect(() => {
     let active = true;
-    api.getDocuments(recordId).then((data) => {
+    getDocuments(recordId).then((data) => {
       if (active) { setDocuments(data); setLoadError(''); }
     }).catch((error) => {
       if (active) setLoadError(error.message);
@@ -44,7 +52,7 @@ export function SupportingDocuments({ recordId, editable = false, disabled = fal
     finally { running.current = false; setBusy(''); onBusyChange?.(false); }
   };
   const upload = () => perform(`Uploading ${selected.length} documents...`, async () => {
-    const added = await api.uploadDocuments(recordId, selected);
+    const added = await uploadDocumentsProvider(recordId, selected);
     setDocuments((current) => [...current, ...added]);
     setSelected([]); fileInput.current.value = '';
     setNotice(`${added.length} document${added.length === 1 ? '' : 's'} uploaded.`);
@@ -55,13 +63,13 @@ export function SupportingDocuments({ recordId, editable = false, disabled = fal
     if (!file) return;
     const id = replacementId.current;
     perform('Replacing document...', async () => {
-      const updated = await api.replaceDocument(id, file);
+      const updated = await replaceDocumentProvider(id, file);
       setDocuments((current) => current.map((doc) => doc.id === id ? updated : doc));
       setNotice('Document replaced.');
     });
   };
   const remove = () => perform('Removing document...', async () => {
-    await api.deleteDocument(removeTarget.id);
+    await deleteDocumentProvider(removeTarget.id);
     setDocuments((current) => current.filter((doc) => doc.id !== removeTarget.id));
     setRemoveTarget(null); setNotice('Document removed.');
   });
@@ -74,25 +82,38 @@ export function SupportingDocuments({ recordId, editable = false, disabled = fal
         <p className="detail-paragraph muted">No supporting documents are currently attached to this record.</p>
       ) : (
         <ul className="document-list">
-          {documents.map((doc) => (
-            <li className="document-item" key={doc.id}>
-              <div className="document-icon"><FileText className="meta-icon" aria-hidden="true" /></div>
-              <div className="document-info">
-                <p className="document-name">{doc.originalFileName}</p>
-                <p className="document-meta">PDF &middot; {sizeLabel(doc.fileSize)}</p>
-                <p className="document-meta">Uploaded {new Date(`${doc.uploadedAt}Z`).toLocaleString()}</p>
-                {doc.updatedAt !== doc.uploadedAt && <p className="document-meta">Updated {new Date(`${doc.updatedAt}Z`).toLocaleString()}</p>}
-              </div>
-              <div className="document-actions">
-                <a className="btn btn-sm btn-secondary" href={api.previewDocument(doc.id)} target="_blank" rel="noopener noreferrer" aria-label={`Preview ${doc.originalFileName}`}>Preview</a>
-                <a className="btn btn-sm btn-secondary" href={api.downloadDocument(doc.id)} aria-label={`Download ${doc.originalFileName}`}>Download</a>
-                {editable && <>
-                  <button type="button" className="btn btn-sm btn-secondary" disabled={disabled || Boolean(busy)} aria-label={`Replace ${doc.originalFileName}`} onClick={() => { replacementId.current = doc.id; replacementInput.current.click(); }}>Replace</button>
-                  <button type="button" className="btn btn-sm btn-secondary" disabled={disabled || Boolean(busy)} aria-label={`Remove ${doc.originalFileName}`} onClick={() => setRemoveTarget(doc)}>Remove</button>
-                </>}
-              </div>
-            </li>
-          ))}
+          {documents.map((doc) => {
+            const { preview, download } = getDocumentUrls(doc);
+            const unavailable = demoMode && !preview && !download;
+            return (
+              <li className="document-item" key={doc.id}>
+                <div className="document-icon"><FileText className="meta-icon" aria-hidden="true" /></div>
+                <div className="document-info">
+                  <p className="document-name">{doc.originalFileName}</p>
+                  <p className="document-meta">PDF &middot; {sizeLabel(doc.fileSize)}</p>
+                  <p className="document-meta">Uploaded {new Date(`${doc.uploadedAt}Z`).toLocaleString()}</p>
+                  {doc.updatedAt !== doc.uploadedAt && <p className="document-meta">Updated {new Date(`${doc.updatedAt}Z`).toLocaleString()}</p>}
+                  {unavailable && <p className="document-meta">Preview is unavailable in frontend demo mode.</p>}
+                </div>
+                <div className="document-actions">
+                  {preview ? (
+                    <a className="btn btn-sm btn-secondary" href={preview} target="_blank" rel="noopener noreferrer" aria-label={`Preview ${doc.originalFileName}`}>Preview</a>
+                  ) : (
+                    <span className="btn btn-sm btn-secondary demo-unavailable" aria-disabled="true" title="Preview is unavailable in frontend demo mode.">Preview</span>
+                  )}
+                  {download ? (
+                    <a className="btn btn-sm btn-secondary" href={download} aria-label={`Download ${doc.originalFileName}`}>Download</a>
+                  ) : (
+                    <span className="btn btn-sm btn-secondary demo-unavailable" aria-disabled="true" title="Preview is unavailable in frontend demo mode.">Download</span>
+                  )}
+                  {editable && <>
+                    <button type="button" className="btn btn-sm btn-secondary" disabled={disabled || Boolean(busy)} aria-label={`Replace ${doc.originalFileName}`} onClick={() => { replacementId.current = doc.id; replacementInput.current.click(); }}>Replace</button>
+                    <button type="button" className="btn btn-sm btn-secondary" disabled={disabled || Boolean(busy)} aria-label={`Remove ${doc.originalFileName}`} onClick={() => setRemoveTarget(doc)}>Remove</button>
+                  </>}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
       {editable && <>
@@ -105,7 +126,7 @@ export function SupportingDocuments({ recordId, editable = false, disabled = fal
         </div>}
         <div className="document-upload form-group">
           <label className="form-label" htmlFor={labelId}>Add Documents</label>
-          <p id={`${labelId}-hint`} className="document-meta">Select one or more PDFs. Default limit: 20 MiB each, 100 MiB per request. Documents are saved separately from record metadata.</p>
+          <p id={`${labelId}-hint`} className="document-meta">{demoMode ? 'Demo mode: chosen PDFs are previewable during this session, but only document metadata persists after refresh. No files are uploaded to a server.' : 'Select one or more PDFs. Default limit: 20 MiB each, 100 MiB per request. Documents are saved separately from record metadata.'}</p>
           <input id={labelId} ref={fileInput} className="form-control" type="file" accept=".pdf,application/pdf" multiple disabled={disabled || Boolean(busy) || loading || Boolean(loadError)} aria-describedby={`${labelId}-hint`} onChange={(event) => { setSelected(Array.from(event.target.files)); setActionError(''); }} />
           <input ref={replacementInput} type="file" accept=".pdf,application/pdf" hidden aria-label="Replacement PDF" onChange={replace} />
           {selected.length > 0 && <>

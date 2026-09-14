@@ -4,6 +4,7 @@ import { Plus, Eye, Pencil, Trash2, X, AlertTriangle } from 'lucide-react';
 import { useRecords } from '../context/RecordsContext';
 import { StatusBadge } from '../components/StatusBadge';
 import { SupportingDocuments } from '../components/SupportingDocuments';
+import { isDemoMode } from '../data/dataProvider';
 import '../App.css';
 
 const EMPTY_FORM = {
@@ -48,8 +49,9 @@ function extractErrorMessage(error) {
 }
 
 export default function AdminPage() {
-  const { records, addRecord, updateRecord, deleteRecord } = useRecords();
+  const { records, addRecord, updateRecord, deleteRecord, resetDemoData } = useRecords();
   const navigate = useNavigate();
+  const demoMode = isDemoMode();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -165,6 +167,19 @@ export default function AdminPage() {
     [records]
   );
 
+  const handleResetDemo = async () => {
+    const confirmed = window.confirm(
+      'Reset all demo data back to the bundled defaults? Changes made in this browser will be discarded.'
+    );
+    if (!confirmed) return;
+    try {
+      await resetDemoData();
+      showToast('Demo data reset to bundled defaults.');
+    } catch (resetError) {
+      showToast(`Reset failed: ${extractErrorMessage(resetError)}`);
+    }
+  };
+
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === 'Tab' && modalFocusRef.current) {
@@ -219,8 +234,22 @@ export default function AdminPage() {
         </button>
       </div>
 
-      <div className="admin-note" role="note">
-        Changes are saved to the repository database and persist after reload.
+      <div className={`admin-note ${demoMode ? 'admin-note-row' : ''}`} role="note">
+        {demoMode ? (
+          <>
+            Demo mode: changes are stored in this browser and persist after reload. They are not shared with other users.
+            <button
+              type="button"
+              className="btn btn-sm btn-secondary"
+              onClick={handleResetDemo}
+              aria-label="Reset demo data to bundled defaults"
+            >
+              Reset Demo Data
+            </button>
+          </>
+        ) : (
+          'Changes are saved to the repository database and persist after reload.'
+        )}
       </div>
 
       <div className="card table-card">
