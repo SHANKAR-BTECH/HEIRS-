@@ -4,11 +4,9 @@ A web-based information retrieval system for organizing, searching, managing, an
 
 ## Live Demo
 
-[Open HEIRS Demo](https://heirs-git-main-shankar26.vercel.app/)
+[Open HEIRS Demo](https://heirs-azure.vercel.app/)
 
 The deployed version runs in frontend demo mode using bundled demo data and browser-local persistence. The real Spring Boot + MySQL mode is intended for local full-stack use.
-
-> **Note:** If the deployment is protected by Vercel Deployment Protection, visitors will see a login prompt until protection is disabled in the Vercel dashboard.
 
 ## Project Overview
 
