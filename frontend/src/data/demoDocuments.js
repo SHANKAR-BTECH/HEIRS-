@@ -10,7 +10,42 @@
 // (it appends a trailing "Z" before formatting).
 
 export const demoDocuments = [
-  // Skill Enhancement Policy — 3 supporting documents (multi-doc demo).
+  // ── heirs-pol-2026-014: National Digital Learning Policy — 3 docs ──
+  {
+    id: 'demo-doc-dlp-main',
+    recordId: 'heirs-pol-2026-014',
+    originalFileName: 'Main Policy.pdf',
+    contentType: 'application/pdf',
+    fileSize: 245000,
+    demo: true,
+    srcFile: '/demo-documents/digital_learning_policy_main.pdf',
+    uploadedAt: '2026-03-12T09:00:00',
+    updatedAt: '2026-03-12T09:00:00',
+  },
+  {
+    id: 'demo-doc-dlp-guidelines',
+    recordId: 'heirs-pol-2026-014',
+    originalFileName: 'Implementation Guidelines.pdf',
+    contentType: 'application/pdf',
+    fileSize: 178000,
+    demo: true,
+    srcFile: '/demo-documents/digital_learning_policy_guidelines.pdf',
+    uploadedAt: '2026-03-14T11:30:00',
+    updatedAt: '2026-03-14T11:30:00',
+  },
+  {
+    id: 'demo-doc-dlp-annexure',
+    recordId: 'heirs-pol-2026-014',
+    originalFileName: 'Annexure.pdf',
+    contentType: 'application/pdf',
+    fileSize: 94000,
+    demo: true,
+    srcFile: '/demo-documents/digital_learning_policy_annexure.pdf',
+    uploadedAt: '2026-03-15T14:20:00',
+    updatedAt: '2026-03-15T14:20:00',
+  },
+
+  // ── te-pol-2026-078: Skill Enhancement Policy — 3 docs ──
   {
     id: 'demo-doc-skill-main',
     recordId: 'te-pol-2026-078',
@@ -45,7 +80,7 @@ export const demoDocuments = [
     updatedAt: '2026-04-22T16:40:00',
   },
 
-  // Student Financial Assistance Scheme — two documents.
+  // ── heirs-sch-2025-032: Student Financial Assistance Scheme — 2 docs ──
   {
     id: 'demo-doc-scheme-guidelines',
     recordId: 'heirs-sch-2025-032',
@@ -69,7 +104,7 @@ export const demoDocuments = [
     updatedAt: '2025-01-16T12:20:00',
   },
 
-  // Ph.D. Scholarship and Research Policy — one document.
+  // ── heirs-pol-2022-026: Ph.D. Scholarship — 1 doc ──
   {
     id: 'demo-doc-phd-guidelines',
     recordId: 'heirs-pol-2022-026',
@@ -82,8 +117,68 @@ export const demoDocuments = [
     updatedAt: '2022-11-05T08:45:00',
   },
 
-  // National Merit Scholarship — metadata only (no bundled file) to show the
-  // graceful "Preview is unavailable in frontend demo mode." behavior.
+  // ── heirs-pol-2025-033: Distance Learning Policy — 2 docs ──
+  {
+    id: 'demo-doc-dlp2-main',
+    recordId: 'heirs-pol-2025-033',
+    originalFileName: 'Distance Learning Policy.pdf',
+    contentType: 'application/pdf',
+    fileSize: 167000,
+    demo: true,
+    srcFile: '/demo-documents/distance_learning_policy_main.pdf',
+    uploadedAt: '2025-09-18T10:15:00',
+    updatedAt: '2025-09-18T10:15:00',
+  },
+  {
+    id: 'demo-doc-dlp2-credit',
+    recordId: 'heirs-pol-2025-033',
+    originalFileName: 'Credit Transfer Guidelines.pdf',
+    contentType: 'application/pdf',
+    fileSize: 112000,
+    demo: true,
+    srcFile: '/demo-documents/distance_learning_credit_transfer.pdf',
+    uploadedAt: '2025-09-20T09:00:00',
+    updatedAt: '2025-09-20T09:00:00',
+  },
+
+  // ── ua-pol-2025-044: Digital Governance Policy — 2 docs ──
+  {
+    id: 'demo-doc-dg-framework',
+    recordId: 'ua-pol-2025-044',
+    originalFileName: 'E-Administration Framework.pdf',
+    contentType: 'application/pdf',
+    fileSize: 195000,
+    demo: true,
+    srcFile: '/demo-documents/digital_governance_framework.pdf',
+    uploadedAt: '2025-07-17T13:00:00',
+    updatedAt: '2025-07-17T13:00:00',
+  },
+  {
+    id: 'demo-doc-dg-impl',
+    recordId: 'ua-pol-2025-044',
+    originalFileName: 'Implementation Guide.pdf',
+    contentType: 'application/pdf',
+    fileSize: 143000,
+    demo: true,
+    srcFile: '/demo-documents/digital_governance_implementation.pdf',
+    uploadedAt: '2025-07-19T16:10:00',
+    updatedAt: '2025-07-19T16:10:00',
+  },
+
+  // ── heirs-pol-2026-067: Placement and Recruitment Policy — 1 doc ──
+  {
+    id: 'demo-doc-placement-guidelines',
+    recordId: 'heirs-pol-2026-067',
+    originalFileName: 'Placement Guidelines.pdf',
+    contentType: 'application/pdf',
+    fileSize: 156000,
+    demo: true,
+    srcFile: '/demo-documents/placement_recruitment_guidelines.pdf',
+    uploadedAt: '2026-03-02T08:45:00',
+    updatedAt: '2026-03-02T08:45:00',
+  },
+
+  // ── heirs-sch-2024-018: National Merit Scholarship — metadata only (no bundled file) ──
   {
     id: 'demo-doc-merit-handbook',
     recordId: 'heirs-sch-2024-018',
@@ -96,7 +191,7 @@ export const demoDocuments = [
     updatedAt: '2024-07-22T09:10:00',
   },
 
-  // Women's Empowerment in Higher Education Policy — metadata only.
+  // ── heirs-pol-2023-019: Women's Empowerment — metadata only ──
   {
     id: 'demo-doc-women-circular',
     recordId: 'heirs-pol-2023-019',

@@ -7,7 +7,8 @@
 
 export const STORAGE_KEYS = {
   records: 'heirs_demo_records_v1',
-  documents: 'heirs_demo_documents_v1',
+  documents: 'heirs_demo_documents_v2',
+  documentsLegacy: 'heirs_demo_documents_v1',
 };
 
 export function loadStored(key, fallback, validate = () => true) {

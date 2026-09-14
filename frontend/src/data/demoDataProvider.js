@@ -20,10 +20,46 @@ let documents = null;
 // working after a page refresh, which is why they are session-only.
 const sessionUrls = new Map();
 
+// Load demo documents with a v1 → v2 migration.  Browsers that visited the
+// deployed site before this fix may already have a valid but incomplete
+// `heirs_demo_documents_v1` key.  We preserve any user-uploaded document
+// metadata from that legacy key (identified by ID not matching the bundled
+// set) and merge it with the current bundled defaults into v2.  The v1 key
+// is removed, and the merged set is persisted to v2, so this only runs once.
+function loadDemoDocuments() {
+  const bundled = cloneDemoDocuments();
+  const bundledIds = new Set(bundled.map((d) => d.id));
+
+  // Normal v2 load (may return null if key is missing or invalid).
+  const stored = loadStored(STORAGE_KEYS.documents, null, isValidDemoDocument);
+
+  let userDocs = [];
+  let shouldPersist = false;
+  if (Array.isArray(stored)) {
+    // Preserve user-created documents that are not part of the bundled set.
+    userDocs = stored.filter((d) => !bundledIds.has(d.id));
+  } else {
+    // One-time migration from v1 (only if v2 had no stored data).
+    shouldPersist = true;
+    const legacy = loadStored(STORAGE_KEYS.documentsLegacy, null, isValidDemoDocument);
+    if (Array.isArray(legacy)) {
+      userDocs = legacy.filter((d) => !bundledIds.has(d.id));
+    }
+    // Clean up the legacy key.
+    try { window.localStorage.removeItem(STORAGE_KEYS.documentsLegacy); } catch { /* ignore */ }
+  }
+
+  const merged = [...bundled, ...userDocs];
+  if (shouldPersist) {
+    storeValue(STORAGE_KEYS.documents, merged);
+  }
+  return merged.map(cloneDemoDocument);
+}
+
 function ensureLoaded() {
   if (records !== null) return;
   records = loadStored(STORAGE_KEYS.records, cloneDemoRecords(), isValidDemoRecord).map(cloneDemoRecord);
-  documents = loadStored(STORAGE_KEYS.documents, cloneDemoDocuments(), isValidDemoDocument).map(cloneDemoDocument);
+  documents = loadDemoDocuments();
 }
 
 function cloneDemoRecord(record) {
