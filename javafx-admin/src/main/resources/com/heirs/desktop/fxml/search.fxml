@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:controller="com.heirs.desktop.controller.SearchController"
+      styleClass="workspace-root"
+      xmlns:fx="http://javafx.com/fxml"
+      xmlns="http://javafx.com/javafx"
+      spacing="10">
+
+    <!-- Screen Header -->
+    <HBox alignment="CENTER_LEFT" styleClass="screen-header">
+        <VBox spacing="2">
+            <Label styleClass="screen-title" text="Search &amp; Retrieval"/>
+            <Label styleClass="screen-subtitle" text="Query education regulations, policies, schemes, and rules using multi-attribute parametric search."/>
+        </VBox>
+    </HBox>
+
+    <!-- Desktop Search Criteria Form Panel -->
+    <TitledPane text="Search Criteria" collapsible="false" styleClass="desktop-titled-pane">
+        <VBox spacing="10" styleClass="panel-body">
+            <GridPane hgap="12" vgap="8" styleClass="search-grid">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="90" prefWidth="100" halignment="RIGHT"/>
+                    <ColumnConstraints minWidth="220" prefWidth="280" hgrow="ALWAYS"/>
+                    <ColumnConstraints minWidth="80" prefWidth="95" halignment="RIGHT"/>
+                    <ColumnConstraints minWidth="150" prefWidth="180" hgrow="ALWAYS"/>
+                    <ColumnConstraints minWidth="60" prefWidth="75" halignment="RIGHT"/>
+                    <ColumnConstraints minWidth="110" prefWidth="130"/>
+                </columnConstraints>
+
+                <!-- Row 0: Keyword & Category & Year -->
+                <Label text="Keyword:" styleClass="form-label" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <TextField fx:id="searchField" promptText="Enter title, keyword, reference number..."
+                           styleClass="desktop-text-field" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                <Label text="Category:" styleClass="form-label" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                <ComboBox fx:id="categoryFilter" maxWidth="Infinity" styleClass="desktop-combo-box"
+                          GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+
+                <Label text="Year:" styleClass="form-label" GridPane.columnIndex="4" GridPane.rowIndex="0"/>
+                <ComboBox fx:id="yearFilter" maxWidth="Infinity" styleClass="desktop-combo-box"
+                          GridPane.columnIndex="5" GridPane.rowIndex="0"/>
+
+                <!-- Row 1: Department & Status & Action Buttons -->
+                <Label text="Department:" styleClass="form-label" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <ComboBox fx:id="departmentFilter" maxWidth="Infinity" styleClass="desktop-combo-box"
+                          GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                <Label text="Status:" styleClass="form-label" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                <ComboBox fx:id="statusFilter" maxWidth="Infinity" styleClass="desktop-combo-box"
+                          GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+
+                <HBox spacing="8" alignment="CENTER_RIGHT" GridPane.columnIndex="4" GridPane.columnSpan="2" GridPane.rowIndex="1">
+                    <Button fx:id="searchButton" text="Search" styleClass="button-desktop-secondary"/>
+                    <Button fx:id="clearFilters" text="Clear" styleClass="button-desktop-secondary"/>
+                </HBox>
+            </GridPane>
+        </VBox>
+    </TitledPane>
+
+    <!-- Desktop Search Results Section -->
+    <TitledPane text="Search Results" collapsible="false" VBox.vgrow="ALWAYS" styleClass="desktop-titled-pane">
+        <VBox spacing="8" styleClass="panel-body" VBox.vgrow="ALWAYS">
+            <TableView fx:id="resultsTable" VBox.vgrow="ALWAYS" styleClass="desktop-table">
+                <placeholder>
+                    <Label text="No records match the given search criteria." styleClass="table-placeholder"/>
+                </placeholder>
+            </TableView>
+
+            <!-- Results status strip -->
+            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="table-footer-strip">
+                <Label fx:id="resultCount" styleClass="footer-status-label" text="Showing 60 of 60 records"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="btnViewDetails" text="View Record Details" styleClass="button-desktop-secondary"/>
+            </HBox>
+        </VBox>
+    </TitledPane>
+
+</VBox>

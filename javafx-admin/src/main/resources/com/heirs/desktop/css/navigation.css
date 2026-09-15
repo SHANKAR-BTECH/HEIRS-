@@ -1,0 +1,64 @@
+/* ============================================================
+   HEIRS Desktop — navigation.css
+   Traditional Desktop Navigation Panel & TreeView Stylesheet.
+   Neutral palette (#F4F4F4), classic explorer selection (#DCE6F1 / #D9E7F5).
+   ============================================================ */
+
+.nav-container {
+    -fx-background-color: #F4F4F4;
+    -fx-border-color: transparent #C7C7C7 transparent transparent;
+    -fx-border-width: 1px;
+}
+
+.nav-header {
+    -fx-background-color: #E8E8E8;
+    -fx-border-color: transparent transparent #C7C7C7 transparent;
+    -fx-border-width: 1px;
+    -fx-padding: 5 10 5 10;
+}
+
+.nav-header-title {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+/* ================= TreeView ================= */
+
+.desktop-treeview {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-padding: 4 2 4 2;
+}
+
+.desktop-treeview .tree-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #202020;
+    -fx-font-size: 12px;
+    -fx-padding: 3 6 3 4;
+    -fx-graphic-text-gap: 6px;
+}
+
+.desktop-treeview .tree-cell:hover {
+    -fx-background-color: #EAEAEA;
+    -fx-background-radius: 2px;
+}
+
+.desktop-treeview .tree-cell:selected {
+    -fx-background-color: #D9E7F5;
+    -fx-text-fill: #202020;
+    -fx-background-radius: 2px;
+}
+
+.desktop-treeview .tree-cell:selected .label {
+    -fx-text-fill: #202020;
+}
+
+.desktop-treeview .tree-cell:selected .ikonli-font-icon {
+    -fx-icon-color: #333333;
+}
+
+.desktop-treeview .tree-cell .ikonli-font-icon {
+    -fx-icon-color: #555555;
+}

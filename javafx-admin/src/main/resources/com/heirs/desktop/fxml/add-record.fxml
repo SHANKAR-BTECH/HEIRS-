@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<DialogPane fx:controller="com.heirs.desktop.controller.RecordFormController"
+            styleClass="desktop-dialog"
+            prefWidth="640"
+            xmlns:fx="http://javafx.com/fxml"
+            xmlns="http://javafx.com/javafx">
+
+    <content>
+        <VBox spacing="12" styleClass="dialog-container">
+            <VBox spacing="2">
+                <Label fx:id="formTitle" styleClass="dialog-title" text="Add Record"/>
+                <Label styleClass="dialog-subtitle" text="Enter record metadata for registration in the institutional repository."/>
+            </VBox>
+
+            <Separator styleClass="dialog-separator"/>
+
+            <GridPane fx:id="formGrid" hgap="10" vgap="9" styleClass="form-grid">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="125" prefWidth="135" halignment="RIGHT"/>
+                    <ColumnConstraints minWidth="180" prefWidth="200" hgrow="ALWAYS"/>
+                    <ColumnConstraints minWidth="90" prefWidth="105" halignment="RIGHT"/>
+                    <ColumnConstraints minWidth="120" prefWidth="150" hgrow="ALWAYS"/>
+                </columnConstraints>
+
+                <!-- Row 0: Reference & Category -->
+                <Label text="Reference:" styleClass="form-label" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <TextField fx:id="referenceField" promptText="e.g. HEIRS/POL/2026/015" styleClass="form-text-field"
+                           GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                <Label text="Category:" styleClass="form-label" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                <ComboBox fx:id="categoryField" maxWidth="Infinity" styleClass="form-combo-box"
+                          GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+
+                <!-- Row 1: Title (spans across) -->
+                <Label text="Title:" styleClass="form-label" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <TextField fx:id="titleField" promptText="Official record title" styleClass="form-text-field"
+                           GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="1"/>
+
+                <!-- Row 2: Department & Year -->
+                <Label text="Department:" styleClass="form-label" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <TextField fx:id="departmentField" maxWidth="Infinity" styleClass="form-text-field"
+                          GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                <Label text="Year:" styleClass="form-label" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+                <TextField fx:id="yearField" promptText="1900-2100 (optional)" maxWidth="Infinity" styleClass="form-text-field"
+                          GridPane.columnIndex="3" GridPane.rowIndex="2"/>
+
+                <!-- Row 3: Published Date & Status -->
+                <Label text="Published Date:" styleClass="form-label" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                <DatePicker fx:id="publishDateField" maxWidth="Infinity" styleClass="form-date-picker"
+                            GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+                <Label text="Status:" styleClass="form-label" GridPane.columnIndex="2" GridPane.rowIndex="3"/>
+                <ComboBox fx:id="statusField" maxWidth="Infinity" styleClass="form-combo-box"
+                          GridPane.columnIndex="3" GridPane.rowIndex="3"/>
+
+                <!-- Row 4: Keywords (spans across) -->
+                <Label text="Keywords:" styleClass="form-label" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                <TextField fx:id="keywordsField" promptText="Comma-separated keywords" styleClass="form-text-field"
+                           GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="4"/>
+
+                <!-- Row 5: Description -->
+                <Label text="Description:" styleClass="form-label" GridPane.columnIndex="0" GridPane.rowIndex="5"
+                       GridPane.valignment="TOP"/>
+                <TextArea fx:id="descriptionField" promptText="Detailed description and abstract"
+                          prefRowCount="4" wrapText="true" styleClass="form-text-area"
+                          GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="5"/>
+                <Label text="Source:" styleClass="form-label" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
+                <TextField fx:id="sourceField" styleClass="form-text-field" GridPane.columnIndex="1"
+                           GridPane.columnSpan="3" GridPane.rowIndex="6"/>
+            </GridPane>
+
+            <Separator styleClass="dialog-separator"/>
+
+            <Label styleClass="form-hint" text="Title, reference, category, department and status are required."/>
+            <Label fx:id="formMessage" wrapText="true" maxWidth="600" styleClass="form-hint"/>
+        </VBox>
+    </content>
+
+</DialogPane>

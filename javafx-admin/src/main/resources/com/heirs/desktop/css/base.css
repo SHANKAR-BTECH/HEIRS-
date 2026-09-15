@@ -1,0 +1,254 @@
+/* ============================================================
+   HEIRS Desktop — base.css
+   Traditional Desktop Administration Application Base Stylesheet.
+   Neutral palette, Segoe UI typography, crisp borders, zero SaaS cards.
+   ============================================================ */
+
+.root {
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-font-size: 12px;
+    -fx-text-fill: #202020;
+    -fx-background-color: #F0F0F0;
+
+    /* Professional Traditional Desktop Theme Colors */
+    -fx-desktop-bg: #F0F0F0;
+    -fx-panel-bg: #FFFFFF;
+    -fx-nav-bg: #F4F4F4;
+    -fx-toolbar-bg: #F0F0F0;
+    -fx-border-color-desktop: #C7C7C7;
+    -fx-border-subtle: #D8D8D8;
+    -fx-text-primary: #202020;
+    -fx-text-secondary: #555555;
+    -fx-text-muted: #777777;
+    -fx-selection-bg: #D9E7F5;
+    -fx-selection-text: #202020;
+}
+
+/* ================= Window & Workspace ================= */
+
+.desktop-window {
+    -fx-background-color: -fx-desktop-bg;
+}
+
+.center-workspace {
+    -fx-background-color: -fx-desktop-bg;
+    -fx-padding: 0;
+}
+
+.workspace-root {
+    -fx-background-color: -fx-desktop-bg;
+    -fx-padding: 8 10 8 10;
+}
+
+/* Screen Headers */
+.screen-header {
+    -fx-background-color: -fx-panel-bg;
+    -fx-border-color: -fx-border-color-desktop;
+    -fx-border-width: 1px;
+    -fx-border-radius: 2px;
+    -fx-background-radius: 2px;
+    -fx-padding: 6 10 6 10;
+}
+
+.screen-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #202020;
+}
+
+.screen-subtitle {
+    -fx-font-size: 11px;
+    -fx-text-fill: -fx-text-secondary;
+}
+
+.section-header-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #202020;
+    -fx-padding: 2 0 3 0;
+}
+
+/* ================= Status Bar ================= */
+
+.desktop-statusbar {
+    -fx-background-color: #E8E8E8;
+    -fx-border-color: -fx-border-color-desktop transparent transparent transparent;
+    -fx-border-width: 1px;
+    -fx-padding: 3 8 3 8;
+    -fx-min-height: 22px;
+    -fx-max-height: 22px;
+}
+
+.status-field {
+    -fx-font-size: 11px;
+    -fx-text-fill: #333333;
+}
+
+.statusbar-dot-ready {
+    -fx-background-color: #2E7D32;
+    -fx-background-radius: 4px;
+    -fx-min-width: 6px;
+    -fx-max-width: 6px;
+    -fx-min-height: 6px;
+    -fx-max-height: 6px;
+}
+
+.statusbar-dot-offline {
+    -fx-background-color: #C62828;
+    -fx-background-radius: 4px;
+    -fx-min-width: 6px;
+    -fx-max-width: 6px;
+    -fx-min-height: 6px;
+    -fx-max-height: 6px;
+}
+
+.status-separator {
+    -fx-padding: 0 4 0 4;
+}
+
+.status-separator .line {
+    -fx-border-color: transparent -fx-border-color-desktop transparent transparent;
+}
+
+/* ================= Buttons ================= */
+
+.button {
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-font-size: 12px;
+    -fx-background-color: #E9E9E9;
+    -fx-border-color: #B7B7B7;
+    -fx-border-width: 1px;
+    -fx-text-fill: #202020;
+    -fx-background-radius: 2px;
+    -fx-border-radius: 2px;
+    -fx-padding: 3 10 3 10;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #E2E2E2;
+}
+
+.button:pressed {
+    -fx-background-color: #D6D6D6;
+}
+
+.button-desktop-primary,
+.button-primary {
+    -fx-background-color: #E2E6EA;
+    -fx-border-color: #7A8590;
+    -fx-border-width: 1px;
+    -fx-text-fill: #1A2530;
+    -fx-font-weight: bold;
+    -fx-background-radius: 2px;
+    -fx-border-radius: 2px;
+    -fx-padding: 3 10 3 10;
+}
+
+.button-desktop-primary:hover,
+.button-primary:hover {
+    -fx-background-color: #D8DCE2;
+}
+
+.button-desktop-primary:pressed,
+.button-primary:pressed {
+    -fx-background-color: #C8CED6;
+}
+
+.button-desktop-secondary,
+.button-secondary {
+    -fx-background-color: #E9E9E9;
+    -fx-border-color: #B7B7B7;
+    -fx-border-width: 1px;
+    -fx-text-fill: #202020;
+    -fx-background-radius: 2px;
+    -fx-border-radius: 2px;
+    -fx-padding: 3 10 3 10;
+}
+
+.button-desktop-secondary:hover,
+.button-secondary:hover {
+    -fx-background-color: #E2E2E2;
+}
+
+.button-desktop-secondary:pressed,
+.button-secondary:pressed {
+    -fx-background-color: #D6D6D6;
+}
+
+.button-desktop-danger,
+.button-danger {
+    -fx-background-color: #FFF5F5;
+    -fx-border-color: #C62828;
+    -fx-border-width: 1px;
+    -fx-text-fill: #A71D2A;
+    -fx-background-radius: 2px;
+    -fx-border-radius: 2px;
+    -fx-padding: 3 10 3 10;
+}
+
+.button-desktop-danger:hover,
+.button-danger:hover {
+    -fx-background-color: #FEEBEB;
+}
+
+.button-desktop-danger:pressed,
+.button-danger:pressed {
+    -fx-background-color: #F8D7DA;
+}
+
+.button-save {
+    -fx-background-color: #EBF3EB;
+    -fx-border-color: #2E7D32;
+    -fx-border-width: 1px;
+    -fx-text-fill: #1B5E20;
+    -fx-font-weight: bold;
+    -fx-background-radius: 2px;
+    -fx-border-radius: 2px;
+    -fx-padding: 3 12 3 12;
+}
+
+.button-save:hover {
+    -fx-background-color: #DFECDF;
+}
+
+.button-save:pressed {
+    -fx-background-color: #D3E4D3;
+}
+
+/* ================= Separators ================= */
+
+.section-divider {
+    -fx-padding: 3 0 3 0;
+}
+
+.section-divider .line {
+    -fx-border-color: -fx-border-subtle transparent transparent transparent;
+    -fx-border-width: 1px;
+}
+
+.control-separator .line {
+    -fx-border-color: transparent -fx-border-subtle transparent transparent;
+    -fx-border-width: 1px;
+}
+
+/* ================= Scroll Bars ================= */
+
+.scroll-bar {
+    -fx-background-color: #F4F4F4;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 0;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #C1C1C1;
+    -fx-background-radius: 2px;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #A8A8A8;
+}
+
+.scroll-bar .thumb:pressed {
+    -fx-background-color: #787878;
+}

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:controller="com.heirs.desktop.controller.RecordsController"
+      styleClass="workspace-root"
+      xmlns:fx="http://javafx.com/fxml"
+      xmlns="http://javafx.com/javafx"
+      spacing="10">
+
+    <!-- Screen Header -->
+    <HBox alignment="CENTER_LEFT" styleClass="screen-header">
+        <VBox spacing="2">
+            <Label styleClass="screen-title" text="Manage Records"/>
+            <Label styleClass="screen-subtitle" text="Central repository database view. Query, inspect, filter, and maintain registered education records."/>
+        </VBox>
+    </HBox>
+
+    <!-- Traditional Desktop Control & Filter Bar -->
+    <VBox spacing="6" styleClass="control-panel">
+        <!-- Row 1: Search and Category/Status Filters -->
+        <HBox alignment="CENTER_LEFT" spacing="8" styleClass="filter-row">
+            <Label text="Search:" styleClass="filter-label"/>
+            <TextField fx:id="searchField" promptText="Filter by title, reference, or department..."
+                       prefWidth="280" styleClass="desktop-text-field"/>
+            <Button fx:id="btnFind" text="Find" styleClass="button-desktop-secondary"/>
+            <Button fx:id="btnClearFilter" text="Clear" styleClass="button-desktop-secondary"/>
+
+            <Separator orientation="VERTICAL" styleClass="control-separator"/>
+
+            <Label text="Category:" styleClass="filter-label"/>
+            <ComboBox fx:id="categoryFilter" prefWidth="160" styleClass="desktop-combo-box"/>
+
+            <Label text="Status:" styleClass="filter-label"/>
+            <ComboBox fx:id="statusFilter" prefWidth="140" styleClass="desktop-combo-box"/>
+        </HBox>
+
+        <Separator styleClass="section-divider"/>
+
+        <!-- Row 2: Record Action Buttons -->
+        <HBox alignment="CENTER_LEFT" spacing="8" styleClass="filter-row">
+            <Button fx:id="btnNewRecord" text="New Record..." styleClass="button-desktop-primary"/>
+            <Button fx:id="btnEditRecord" text="Edit Selected" styleClass="button-desktop-secondary"/>
+            <Button fx:id="btnDeleteRecord" text="Delete Selected" styleClass="button-desktop-danger"/>
+            <Button fx:id="btnViewRecord" text="View Record Details" styleClass="button-desktop-secondary"/>
+            <Button fx:id="btnRefreshRecords" text="Refresh" styleClass="button-desktop-secondary"/>
+        </HBox>
+    </VBox>
+
+    <!-- Primary Records TableView -->
+    <VBox VBox.vgrow="ALWAYS" styleClass="table-container">
+        <TableView fx:id="tableView" VBox.vgrow="ALWAYS" styleClass="desktop-table">
+            <placeholder>
+                <Label text="No records match the specified search and filter criteria." styleClass="table-placeholder"/>
+            </placeholder>
+        </TableView>
+
+        <!-- Table Footer / Status Strip -->
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="table-footer-strip">
+            <Label fx:id="lblFilterStatus" styleClass="footer-status-label" text="Showing 60 of 60 records"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="Double-click row or right-click for context menu" styleClass="footer-hint-label"/>
+        </HBox>
+    </VBox>
+
+</VBox>

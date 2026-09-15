@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:controller="com.heirs.desktop.controller.ReportsController"
+      styleClass="workspace-root"
+      xmlns:fx="http://javafx.com/fxml"
+      xmlns="http://javafx.com/javafx"
+      spacing="10">
+
+    <!-- Screen Header -->
+    <HBox alignment="CENTER_LEFT" styleClass="screen-header">
+        <VBox spacing="2">
+            <Label styleClass="screen-title" text="Repository Reports &amp; Utility"/>
+            <Label styleClass="screen-subtitle" text="Institutional distribution, categorization metrics, and temporal records breakdown."/>
+        </VBox>
+    </HBox>
+
+    <!-- Traditional TabPane Workspace -->
+    <TabPane fx:id="reportsTabPane" VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE"
+             styleClass="desktop-tabpane">
+
+        <!-- Tab 1: Summary -->
+        <Tab text="Repository Summary">
+            <VBox spacing="10" styleClass="tab-content-pad">
+                <Label text="Overall Repository Metrics" styleClass="section-header-label"/>
+                <TableView fx:id="summaryTable" prefHeight="200" styleClass="desktop-table">
+                    <placeholder>
+                        <Label text="No summary data available." styleClass="table-placeholder"/>
+                    </placeholder>
+                </TableView>
+
+                <Separator styleClass="section-divider"/>
+
+                <Label text="Departmental Distribution Overview" styleClass="section-header-label"/>
+                <TableView fx:id="departmentTable" VBox.vgrow="ALWAYS" styleClass="desktop-table">
+                    <placeholder>
+                        <Label text="No departmental breakdown available." styleClass="table-placeholder"/>
+                    </placeholder>
+                </TableView>
+            </VBox>
+        </Tab>
+
+        <!-- Tab 2: By Category -->
+        <Tab text="By Category">
+            <HBox spacing="14" styleClass="tab-content-pad">
+                <VBox spacing="8" HBox.hgrow="ALWAYS" maxWidth="420" minWidth="340">
+                    <Label text="Category Breakdown Table" styleClass="section-header-label"/>
+                    <TableView fx:id="categoryTable" VBox.vgrow="ALWAYS" styleClass="desktop-table"/>
+                </VBox>
+
+                <Separator orientation="VERTICAL" styleClass="control-separator"/>
+
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="Category Distribution Chart" styleClass="section-header-label"/>
+                    <BarChart fx:id="categoryChart" animated="false" legendVisible="false" VBox.vgrow="ALWAYS"
+                              styleClass="desktop-chart">
+                        <xAxis>
+                            <CategoryAxis label="Category"/>
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis label="Record Count"/>
+                        </yAxis>
+                    </BarChart>
+                </VBox>
+            </HBox>
+        </Tab>
+
+        <!-- Tab 3: By Status -->
+        <Tab text="By Status">
+            <HBox spacing="14" styleClass="tab-content-pad">
+                <VBox spacing="8" HBox.hgrow="ALWAYS" maxWidth="400" minWidth="320">
+                    <Label text="Status Distribution Table" styleClass="section-header-label"/>
+                    <TableView fx:id="statusTable" VBox.vgrow="ALWAYS" styleClass="desktop-table"/>
+                </VBox>
+
+                <Separator orientation="VERTICAL" styleClass="control-separator"/>
+
+                <VBox spacing="8" HBox.hgrow="ALWAYS" alignment="CENTER">
+                    <Label text="Status Proportions" styleClass="section-header-label"/>
+                    <PieChart fx:id="statusChart" animated="false" labelsVisible="true" legendVisible="true"
+                              VBox.vgrow="ALWAYS" styleClass="desktop-chart"/>
+                </VBox>
+            </HBox>
+        </Tab>
+
+        <!-- Tab 4: By Year -->
+        <Tab text="By Year">
+            <HBox spacing="14" styleClass="tab-content-pad">
+                <VBox spacing="8" HBox.hgrow="ALWAYS" maxWidth="380" minWidth="300">
+                    <Label text="Annual Publication Table" styleClass="section-header-label"/>
+                    <TableView fx:id="yearTable" VBox.vgrow="ALWAYS" styleClass="desktop-table"/>
+                </VBox>
+
+                <Separator orientation="VERTICAL" styleClass="control-separator"/>
+
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="Publication Trend Chart" styleClass="section-header-label"/>
+                    <BarChart fx:id="yearChart" animated="false" legendVisible="false" VBox.vgrow="ALWAYS"
+                              styleClass="desktop-chart">
+                        <xAxis>
+                            <CategoryAxis label="Year"/>
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis label="Records Published"/>
+                        </yAxis>
+                    </BarChart>
+                </VBox>
+            </HBox>
+        </Tab>
+
+    </TabPane>
+
+    <!-- Reports Footer Strip -->
+    <HBox alignment="CENTER_LEFT" spacing="10" styleClass="table-footer-strip">
+        <Label styleClass="footer-status-label" text="Data source: In-memory catalogue (60 records)"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label styleClass="footer-hint-label" text="Tabular reporting utility — Phase J1"/>
+    </HBox>
+
+</VBox>

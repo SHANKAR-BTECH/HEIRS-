@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:controller="com.heirs.desktop.controller.AboutController"
+      styleClass="workspace-root"
+      xmlns:fx="http://javafx.com/fxml"
+      xmlns="http://javafx.com/javafx"
+      spacing="10">
+
+    <!-- Screen Header -->
+    <HBox alignment="CENTER_LEFT" styleClass="screen-header">
+        <VBox spacing="2">
+            <Label styleClass="screen-title" text="System Information &amp; About HEIRS"/>
+            <Label styleClass="screen-subtitle" text="Desktop client runtime environment, software version specifications, and institutional architecture."/>
+        </VBox>
+    </HBox>
+
+    <VBox spacing="10" VBox.vgrow="ALWAYS">
+
+        <!-- Top Overview Banner -->
+        <TitledPane text="Software Identification" collapsible="false" styleClass="desktop-titled-pane">
+            <VBox spacing="8" styleClass="panel-body">
+                <HBox spacing="16" alignment="CENTER_LEFT">
+                    <Label fx:id="brandGlyph" styleClass="about-icon-glyph"/>
+                    <VBox spacing="3" HBox.hgrow="ALWAYS">
+                        <Label text="Higher Education Information Retrieval System (HEIRS)" styleClass="about-app-title"/>
+                        <Label text="Desktop Administration Client — Version 0.1.0-j1 (Phase J1 Foundation)" styleClass="about-app-subtitle"/>
+                        <Label text="Institutional information management and compliance retrieval system for university systems and higher education boards."
+                               styleClass="form-hint" wrapText="true"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+        </TitledPane>
+
+        <!-- Architecture & Runtime Row -->
+        <HBox spacing="10" VBox.vgrow="ALWAYS">
+            <!-- Environment & Runtime Specifications -->
+            <TitledPane text="Runtime Environment" collapsible="false" HBox.hgrow="ALWAYS" styleClass="desktop-titled-pane">
+                <VBox spacing="10" styleClass="panel-body">
+                    <GridPane hgap="12" vgap="8" styleClass="summary-grid">
+                        <columnConstraints>
+                            <ColumnConstraints minWidth="140" prefWidth="160"/>
+                            <ColumnConstraints minWidth="180" prefWidth="240" hgrow="ALWAYS"/>
+                        </columnConstraints>
+
+                        <Label text="Client Engine:" styleClass="grid-label" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                        <Label fx:id="lblJavafxVersion" text="JavaFX 21.0.5 Desktop Controls" styleClass="grid-value" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                        <Label text="Java Virtual Machine:" styleClass="grid-label" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <Label fx:id="lblJavaVersion" text="Java 21" styleClass="grid-value" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                        <Label text="Host Operating System:" styleClass="grid-label" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                        <Label fx:id="lblOsInfo" text="Windows Desktop" styleClass="grid-value" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                        <Label text="Active Client Mode:" styleClass="grid-label" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                        <Label text="Standalone Desktop Administrator (Phase J1)" styleClass="grid-value-bold" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+                        <Label text="Local In-Memory Cache:" styleClass="grid-label" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                        <Label text="60 Bundled Educational Records" styleClass="grid-value" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                    </GridPane>
+
+                    <Separator styleClass="section-divider"/>
+
+                    <Label styleClass="form-hint" wrapText="true"
+                           text="Phase J1 delivers the native desktop administrative user experience with no remote dependencies."/>
+                </VBox>
+            </TitledPane>
+
+            <!-- Planned Multi-Tier Architecture -->
+            <TitledPane text="Planned Institutional Architecture" collapsible="false" HBox.hgrow="ALWAYS" styleClass="desktop-titled-pane">
+                <VBox spacing="10" styleClass="panel-body">
+                    <VBox spacing="8" styleClass="arch-box">
+                        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="arch-tier-row">
+                            <Label text="1" styleClass="arch-badge"/>
+                            <VBox spacing="1">
+                                <Label text="Desktop Presentation Layer (JavaFX)" styleClass="grid-value-bold"/>
+                                <Label text="Traditional desktop GUI with MenuBar, ToolBar, TableViews, and Dialogs" styleClass="grid-hint"/>
+                            </VBox>
+                        </HBox>
+
+                        <HBox alignment="CENTER" styleClass="arch-connector">
+                            <Label text="▼  RESTful JSON API Communication (Planned Phase J2)  ▼" styleClass="grid-hint"/>
+                        </HBox>
+
+                        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="arch-tier-row">
+                            <Label text="2" styleClass="arch-badge"/>
+                            <VBox spacing="1">
+                                <Label text="Enterprise Application Server (Spring Boot 3)" styleClass="grid-value-bold"/>
+                                <Label text="Security authorization, business validation, and audit logging services" styleClass="grid-hint"/>
+                            </VBox>
+                        </HBox>
+
+                        <HBox alignment="CENTER" styleClass="arch-connector">
+                            <Label text="▼  Relational Persistence &amp; File Storage (Planned Phase J2/J4)  ▼" styleClass="grid-hint"/>
+                        </HBox>
+
+                        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="arch-tier-row">
+                            <Label text="3" styleClass="arch-badge"/>
+                            <VBox spacing="1">
+                                <Label text="Relational Database (MySQL 8) &amp; Storage" styleClass="grid-value-bold"/>
+                                <Label text="Permanent persistent catalog, metadata indices, and document attachments" styleClass="grid-hint"/>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+
+                    <Separator styleClass="section-divider"/>
+
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <Label text="Public Demonstrator:" styleClass="grid-label"/>
+                        <Hyperlink fx:id="webDemoLink" text="https://heirs-azure.vercel.app/" styleClass="desktop-hyperlink"/>
+                    </HBox>
+                </VBox>
+            </TitledPane>
+        </HBox>
+
+    </VBox>
+
+</VBox>

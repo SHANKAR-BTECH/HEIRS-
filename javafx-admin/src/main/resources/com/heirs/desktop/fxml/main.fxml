@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane fx:controller="com.heirs.desktop.controller.MainController"
+            styleClass="desktop-window"
+            xmlns:fx="http://javafx.com/fxml"
+            xmlns="http://javafx.com/javafx">
+
+    <!-- ======================= TOP: MENUBAR & TOOLBAR ======================= -->
+    <top>
+        <VBox styleClass="top-container" spacing="0">
+            <!-- Proper Desktop MenuBar -->
+            <MenuBar fx:id="menuBar" styleClass="desktop-menubar">
+                <menus>
+                    <!-- File Menu -->
+                    <Menu text="_File">
+                        <MenuItem fx:id="menuFileNew" text="New Record..." accelerator="Shortcut+N"/>
+                        <MenuItem fx:id="menuFileRefresh" text="Refresh" accelerator="F5"/>
+                        <SeparatorMenuItem/>
+                        <MenuItem fx:id="menuFileExit" text="Exit" accelerator="Shortcut+Q"/>
+                    </Menu>
+
+                    <!-- Records Menu -->
+                    <Menu text="_Records">
+                        <MenuItem fx:id="menuRecordsView" text="View All Records"/>
+                        <MenuItem fx:id="menuRecordsAdd" text="Add Record..."/>
+                        <SeparatorMenuItem/>
+                        <MenuItem fx:id="menuRecordsEdit" text="Edit Selected"/>
+                        <MenuItem fx:id="menuRecordsDelete" text="Delete Selected"/>
+                    </Menu>
+
+                    <!-- Search Menu -->
+                    <Menu text="_Search">
+                        <MenuItem fx:id="menuSearchRecords" text="Search Records..." accelerator="Shortcut+F"/>
+                        <MenuItem fx:id="menuSearchClear" text="Clear Search"/>
+                    </Menu>
+
+                    <!-- Reports Menu -->
+                    <Menu text="_Reports">
+                        <MenuItem fx:id="menuReportsSummary" text="Repository Summary"/>
+                        <MenuItem fx:id="menuReportsCategory" text="Category Report"/>
+                        <MenuItem fx:id="menuReportsStatus" text="Status Report"/>
+                    </Menu>
+
+                    <!-- Tools Menu -->
+                    <Menu text="_Tools">
+                        <MenuItem fx:id="menuToolsSettings" text="Settings..."/>
+                        <MenuItem fx:id="menuToolsStatus" text="System Status..."/>
+                    </Menu>
+
+                    <!-- Help Menu -->
+                    <Menu text="_Help">
+                        <MenuItem fx:id="menuHelpAbout" text="About HEIRS..."/>
+                    </Menu>
+                </menus>
+            </MenuBar>
+
+            <!-- Classic Desktop ToolBar -->
+            <ToolBar fx:id="toolBar" styleClass="desktop-toolbar">
+                <items>
+                    <Button fx:id="toolNew" text="New" styleClass="toolbar-button"/>
+                    <Button fx:id="toolEdit" text="Edit" styleClass="toolbar-button"/>
+                    <Button fx:id="toolDelete" text="Delete" styleClass="toolbar-button, toolbar-button-danger"/>
+                    <Separator orientation="VERTICAL" styleClass="toolbar-separator"/>
+                    <Button fx:id="toolRefresh" text="Refresh" styleClass="toolbar-button"/>
+                    <Button fx:id="toolSearch" text="Search" styleClass="toolbar-button"/>
+                    <Button fx:id="toolView" text="View" styleClass="toolbar-button"/>
+                    <Separator orientation="VERTICAL" styleClass="toolbar-separator"/>
+                    <Button fx:id="toolReports" text="Reports" styleClass="toolbar-button"/>
+                    <Button fx:id="toolDocuments" text="Documents" styleClass="toolbar-button"/>
+                    <Separator orientation="VERTICAL" styleClass="toolbar-separator"/>
+                    <Button fx:id="toolAbout" text="About" styleClass="toolbar-button"/>
+                </items>
+            </ToolBar>
+        </VBox>
+    </top>
+
+    <!-- ======================= LEFT: NAVIGATION PANEL ======================= -->
+    <left>
+        <VBox styleClass="nav-container" minWidth="230" prefWidth="250" maxWidth="340">
+            <HBox alignment="CENTER_LEFT" styleClass="nav-header">
+                <Label styleClass="nav-header-title" text="Repository Navigation"/>
+            </HBox>
+            <TreeView fx:id="navTree" VBox.vgrow="ALWAYS" styleClass="desktop-treeview"/>
+        </VBox>
+    </left>
+
+    <!-- ======================= CENTER: WORKING AREA ======================= -->
+    <center>
+        <StackPane fx:id="contentArea" styleClass="center-workspace"/>
+    </center>
+
+    <!-- ======================= BOTTOM: STATUS BAR ======================= -->
+    <bottom>
+        <HBox styleClass="desktop-statusbar" alignment="CENTER_LEFT" spacing="8">
+            <HBox alignment="CENTER_LEFT" spacing="5">
+                <Region fx:id="statusDot" styleClass="statusbar-dot-ready"/>
+                <Label fx:id="statusMessage" text="Ready" styleClass="status-field"/>
+            </HBox>
+            <Separator orientation="VERTICAL" styleClass="status-separator"/>
+            <Label fx:id="backendStatusLabel" text="Backend: Checking..." styleClass="status-field"/>
+            <Separator orientation="VERTICAL" styleClass="status-separator"/>
+            <Label fx:id="recordCountLabel" text="Records: —" styleClass="status-field"/>
+            <Separator orientation="VERTICAL" styleClass="status-separator"/>
+            <Label fx:id="uiModeLabel" text="REST Mode" styleClass="status-field"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Separator orientation="VERTICAL" styleClass="status-separator"/>
+            <Label fx:id="systemInfoLabel" text="HEIRS Desktop · Phase J2" styleClass="status-field"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

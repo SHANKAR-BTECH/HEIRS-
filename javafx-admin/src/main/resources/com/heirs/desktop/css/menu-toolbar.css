@@ -1,0 +1,128 @@
+/* ============================================================
+   HEIRS Desktop — menu-toolbar.css
+   Traditional Desktop MenuBar and ToolBar Stylesheet.
+   Neutral palette, classic Windows-style menu behavior, flat compact toolbar.
+   ============================================================ */
+
+.top-container {
+    -fx-background-color: #F0F0F0;
+    -fx-border-color: transparent transparent #C7C7C7 transparent;
+    -fx-border-width: 1px;
+}
+
+/* ================= MenuBar ================= */
+
+.desktop-menubar {
+    -fx-background-color: #F0F0F0;
+    -fx-border-color: transparent transparent #DFDFDF transparent;
+    -fx-border-width: 1px;
+    -fx-padding: 1 4 1 4;
+}
+
+.desktop-menubar > .container > .menu-button {
+    -fx-background-color: transparent;
+    -fx-padding: 3 8 3 8;
+    -fx-font-size: 12px;
+    -fx-text-fill: #202020;
+}
+
+.desktop-menubar > .container > .menu-button:hover,
+.desktop-menubar > .container > .menu-button:showing {
+    -fx-background-color: #E2E2E2;
+    -fx-background-radius: 2px;
+}
+
+.context-menu {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #C7C7C7;
+    -fx-border-width: 1px;
+    -fx-padding: 2 0 2 0;
+}
+
+.menu-item {
+    -fx-padding: 4 16 4 16;
+    -fx-font-size: 12px;
+}
+
+.menu-item:hover,
+.menu-item:focused {
+    -fx-background-color: #D9E7F5;
+    -fx-text-fill: #202020;
+}
+
+.menu-item:hover .label,
+.menu-item:focused .label {
+    -fx-text-fill: #202020;
+}
+
+.menu-item .accelerator-text {
+    -fx-font-size: 11px;
+    -fx-text-fill: #777777;
+}
+
+.menu-item:hover .accelerator-text,
+.menu-item:focused .accelerator-text {
+    -fx-text-fill: #555555;
+}
+
+.separator-menu-item .line {
+    -fx-border-color: #E0E0E0 transparent transparent transparent;
+}
+
+/* ================= ToolBar ================= */
+
+.desktop-toolbar {
+    -fx-background-color: #F4F4F4;
+    -fx-border-color: transparent transparent #C7C7C7 transparent;
+    -fx-border-width: 1px;
+    -fx-padding: 2 6 2 6;
+    -fx-spacing: 2px;
+}
+
+.toolbar-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 1px;
+    -fx-background-radius: 2px;
+    -fx-border-radius: 2px;
+    -fx-padding: 3 8 3 8;
+    -fx-font-size: 11px;
+    -fx-text-fill: #202020;
+    -fx-graphic-text-gap: 5px;
+}
+
+.toolbar-button .ikonli-font-icon {
+    -fx-icon-color: #444444;
+}
+
+.toolbar-button:hover {
+    -fx-background-color: #E2E2E2;
+    -fx-border-color: #B7B7B7;
+}
+
+.toolbar-button:pressed {
+    -fx-background-color: #D6D6D6;
+    -fx-border-color: #999999;
+}
+
+.toolbar-button-danger {
+    -fx-text-fill: #A71D2A;
+}
+
+.toolbar-button-danger .ikonli-font-icon {
+    -fx-icon-color: #A71D2A;
+}
+
+.toolbar-button-danger:hover {
+    -fx-background-color: #FEEBEB;
+    -fx-border-color: #C62828;
+}
+
+.toolbar-separator {
+    -fx-padding: 0 4 0 4;
+}
+
+.toolbar-separator .line {
+    -fx-border-color: transparent #C7C7C7 transparent transparent;
+    -fx-border-width: 1px;
+}

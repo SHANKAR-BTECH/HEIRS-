@@ -1,0 +1,82 @@
+/* ============================================================
+   HEIRS Desktop — dialogs.css
+   Traditional Desktop Modal Dialog Stylesheet.
+   Standard dialog layout, compact GridPane form controls, classic button bars.
+   ============================================================ */
+
+.desktop-dialog {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #C7C7C7;
+    -fx-border-width: 1px;
+}
+
+.desktop-dialog > .header-panel {
+    -fx-background-color: #E8E8E8;
+    -fx-border-color: transparent transparent #C7C7C7 transparent;
+    -fx-border-width: 1px;
+    -fx-padding: 6 10 6 10;
+}
+
+.dialog-container {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 10 14 10 14;
+}
+
+.dialog-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #202020;
+}
+
+.dialog-subtitle {
+    -fx-font-size: 11px;
+    -fx-text-fill: #555555;
+}
+
+.dialog-header-strip {
+    -fx-padding: 0 0 4 0;
+}
+
+.dialog-status-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #202020;
+    -fx-padding: 2 4 2 4;
+}
+
+.dialog-separator {
+    -fx-padding: 3 0 3 0;
+}
+
+.dialog-separator .line {
+    -fx-border-color: #D8D8D8 transparent transparent transparent;
+    -fx-border-width: 1px;
+}
+
+.form-grid {
+    -fx-background-color: transparent;
+}
+
+.form-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+.readonly-field {
+    -fx-background-color: #F4F4F4;
+    -fx-border-color: #D8D8D8;
+    -fx-text-fill: #202020;
+}
+
+.desktop-dialog > .button-bar {
+    -fx-background-color: #E8E8E8;
+    -fx-border-color: #C7C7C7 transparent transparent transparent;
+    -fx-border-width: 1px;
+    -fx-padding: 6 12 6 12;
+}
+
+.desktop-dialog .button-bar .button {
+    -fx-font-size: 12px;
+    -fx-padding: 3 12 3 12;
+}

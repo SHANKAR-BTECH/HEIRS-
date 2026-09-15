@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:controller="com.heirs.desktop.controller.DocumentsController"
+      styleClass="workspace-root"
+      xmlns:fx="http://javafx.com/fxml"
+      xmlns="http://javafx.com/javafx"
+      spacing="10">
+
+    <!-- Screen Header -->
+    <HBox alignment="CENTER_LEFT" styleClass="screen-header">
+        <VBox spacing="2">
+            <Label styleClass="screen-title" text="Document Management"/>
+            <Label styleClass="screen-subtitle" text="Manage institutional policy PDFs, circulars, scheme guidelines, and supporting electronic documents via the HEIRS backend."/>
+        </VBox>
+    </HBox>
+
+    <!-- Record Selection Row -->
+    <HBox alignment="CENTER_LEFT" spacing="8" styleClass="filter-row">
+        <Label text="Record:" styleClass="filter-label"/>
+        <ComboBox fx:id="recordPicker" prefWidth="460" styleClass="desktop-combo-box"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="Documents are always read from the HEIRS backend storage" styleClass="form-hint"/>
+    </HBox>
+
+    <!-- Traditional Desktop Control & Action Bar -->
+    <VBox spacing="8" styleClass="control-panel">
+        <HBox alignment="CENTER_LEFT" spacing="8" styleClass="filter-row">
+            <Label text="Filter Documents:" styleClass="filter-label"/>
+            <TextField fx:id="filterField" promptText="Filter by file name or reference..."
+                       prefWidth="260" styleClass="desktop-text-field"/>
+
+            <Separator orientation="VERTICAL" styleClass="control-separator"/>
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Action Buttons -->
+            <Button fx:id="btnAddDoc" text="Add Document..." styleClass="button-desktop-primary"/>
+            <Button fx:id="btnOpenDoc" text="Open" styleClass="button-desktop-secondary"/>
+            <Button fx:id="btnDownloadDoc" text="Download" styleClass="button-desktop-secondary"/>
+            <Button fx:id="btnReplaceDoc" text="Replace..." styleClass="button-desktop-secondary"/>
+            <Button fx:id="btnRemoveDoc" text="Remove" styleClass="button-desktop-danger"/>
+            <Button fx:id="btnRefreshDoc" text="Refresh" styleClass="button-desktop-secondary"/>
+        </HBox>
+    </VBox>
+
+    <!-- Primary Documents TableView -->
+    <VBox VBox.vgrow="ALWAYS" styleClass="table-container">
+        <TableView fx:id="documentsTable" VBox.vgrow="ALWAYS" styleClass="desktop-table">
+            <placeholder>
+                <Label text="Select a record to view its supporting documents." styleClass="table-placeholder"/>
+            </placeholder>
+        </TableView>
+
+        <!-- Table Footer Strip -->
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="table-footer-strip">
+            <Label fx:id="lblDocStatus" styleClass="footer-status-label" text="Select a record to view its documents"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="Double-click row to open, or right-click for context menu" styleClass="footer-hint-label"/>
+        </HBox>
+    </VBox>
+
+</VBox>

@@ -1,0 +1,100 @@
+/* ============================================================
+   HEIRS Desktop — tables.css
+   Traditional Desktop TableView Stylesheet.
+   Classic data grid, crisp borders, neutral header, plain text cells.
+   ============================================================ */
+
+.table-container {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #C7C7C7;
+    -fx-border-width: 1px;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+}
+
+.desktop-table {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent;
+    -fx-table-cell-border-color: #E2E2E2;
+}
+
+.desktop-table .column-header-background {
+    -fx-background-color: #E8E8E8;
+    -fx-border-color: transparent transparent #C7C7C7 transparent;
+    -fx-border-width: 1px;
+}
+
+.desktop-table .column-header {
+    -fx-background-color: #E8E8E8;
+    -fx-border-color: transparent #C7C7C7 transparent transparent;
+    -fx-border-width: 1px;
+    -fx-padding: 4 8 4 8;
+    -fx-size: 26px;
+}
+
+.desktop-table .column-header .label {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #202020;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.desktop-table .table-row-cell {
+    -fx-padding: 0;
+    -fx-cell-size: 26px;
+    -fx-font-size: 12px;
+}
+
+.desktop-table .table-row-cell:even {
+    -fx-background-color: #FFFFFF;
+}
+
+.desktop-table .table-row-cell:odd {
+    -fx-background-color: #FAFAFA;
+}
+
+.desktop-table .table-row-cell:hover {
+    -fx-background-color: #F2F2F2;
+}
+
+.desktop-table .table-row-cell:selected {
+    -fx-background-color: #D9E7F5;
+    -fx-text-fill: #202020;
+}
+
+.desktop-table .table-row-cell:selected .label {
+    -fx-text-fill: #202020;
+}
+
+.desktop-table .table-cell {
+    -fx-padding: 3 8 3 8;
+    -fx-alignment: CENTER_LEFT;
+    -fx-text-fill: #202020;
+}
+
+.table-placeholder {
+    -fx-font-size: 12px;
+    -fx-text-fill: #777777;
+    -fx-font-style: italic;
+}
+
+/* ================= Table Footer Strip ================= */
+
+.table-footer-strip {
+    -fx-background-color: #F0F0F0;
+    -fx-border-color: #C7C7C7 transparent transparent transparent;
+    -fx-border-width: 1px;
+    -fx-padding: 3 8 3 8;
+    -fx-min-height: 22px;
+}
+
+.footer-status-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #202020;
+    -fx-font-weight: bold;
+}
+
+.footer-hint-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #666666;
+}

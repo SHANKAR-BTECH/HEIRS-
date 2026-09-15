@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:controller="com.heirs.desktop.controller.DashboardController"
+      styleClass="workspace-root"
+      xmlns:fx="http://javafx.com/fxml"
+      xmlns="http://javafx.com/javafx"
+      spacing="10">
+
+    <!-- Screen Title Header -->
+    <HBox alignment="CENTER_LEFT" styleClass="screen-header">
+        <VBox spacing="2">
+            <Label styleClass="screen-title" text="Repository Dashboard"/>
+            <Label styleClass="screen-subtitle" text="Administrative overview of higher education records, catalog statistics, and subsystem status."/>
+        </VBox>
+    </HBox>
+
+    <!-- Top Row: Repository Summary and System Information -->
+    <HBox spacing="10" alignment="TOP_LEFT">
+        <!-- Repository Summary Panel -->
+        <TitledPane text="Repository Summary" collapsible="false" HBox.hgrow="ALWAYS"
+                    styleClass="desktop-titled-pane" prefWidth="480">
+            <VBox spacing="10" styleClass="panel-body">
+                <GridPane hgap="16" vgap="6" styleClass="summary-grid">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="150" prefWidth="180"/>
+                        <ColumnConstraints minWidth="60" prefWidth="80" halignment="RIGHT"/>
+                        <ColumnConstraints minWidth="120" prefWidth="140"/>
+                    </columnConstraints>
+
+                    <Label text="Total Registered Records:" styleClass="grid-label-bold" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <Label fx:id="lblTotalRecords" text="60" styleClass="grid-value-bold" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <Label text="All Categories" styleClass="grid-hint" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+
+                    <Label text="Policies:" styleClass="grid-label" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <Label fx:id="lblPolicies" text="19" styleClass="grid-value" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    <Label text="Guidance documents" styleClass="grid-hint" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+
+                    <Label text="Schemes:" styleClass="grid-label" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                    <Label fx:id="lblSchemes" text="12" styleClass="grid-value" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                    <Label text="Financial assistance" styleClass="grid-hint" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+
+                    <Label text="Regulations:" styleClass="grid-label" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                    <Label fx:id="lblRegulations" text="9" styleClass="grid-value" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                    <Label text="Compliance frameworks" styleClass="grid-hint" GridPane.columnIndex="2" GridPane.rowIndex="3"/>
+
+                    <Label text="Projects:" styleClass="grid-label" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                    <Label fx:id="lblProjects" text="10" styleClass="grid-value" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                    <Label text="Modernisation initiatives" styleClass="grid-hint" GridPane.columnIndex="2" GridPane.rowIndex="4"/>
+
+                    <Label text="Rules:" styleClass="grid-label" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+                    <Label fx:id="lblRules" text="10" styleClass="grid-value" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+                    <Label text="Codes of practice" styleClass="grid-hint" GridPane.columnIndex="2" GridPane.rowIndex="5"/>
+                </GridPane>
+
+                <Separator styleClass="section-divider"/>
+
+                <HBox alignment="CENTER_RIGHT" spacing="8">
+                    <Button fx:id="btnManageAllRecords" text="View All in Manage Records -&gt;" styleClass="button-desktop-secondary"/>
+                </HBox>
+            </VBox>
+        </TitledPane>
+
+        <!-- System Information Panel -->
+        <TitledPane text="System Information" collapsible="false" HBox.hgrow="ALWAYS"
+                    styleClass="desktop-titled-pane" prefWidth="480">
+            <VBox spacing="10" styleClass="panel-body">
+                <GridPane hgap="14" vgap="7" styleClass="summary-grid">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="140" prefWidth="160"/>
+                        <ColumnConstraints minWidth="160" prefWidth="220" hgrow="ALWAYS"/>
+                    </columnConstraints>
+
+                    <Label text="Desktop Client:" styleClass="grid-label" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <Label text="Running (JavaFX 21)" styleClass="grid-value" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                    <Label text="Backend Service:" styleClass="grid-label" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <Label fx:id="lblBackendService" text="Spring Boot REST API" styleClass="grid-value" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                    <Label text="Database Tier:" styleClass="grid-label" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                    <Label text="MySQL 8 via Spring Data JPA" styleClass="grid-value" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                    <Label text="Catalog Data Mode:" styleClass="grid-label" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                    <Label fx:id="lblCatalogDataMode" text="Real-time REST / JSON" styleClass="grid-value" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+                    <Label text="Phase Milestone:" styleClass="grid-label" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                    <Label text="Phase J2 — REST Backend Integration" styleClass="grid-value" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                </GridPane>
+
+                <Separator styleClass="section-divider"/>
+
+                <Label styleClass="form-hint" text="System connects via RESTful HTTP client to the Spring Boot application server without direct JDBC."/>
+            </VBox>
+        </TitledPane>
+    </HBox>
+
+    <!-- Recent Records TableView -->
+    <TitledPane text="Recent Records" collapsible="false" VBox.vgrow="ALWAYS"
+                styleClass="desktop-titled-pane">
+        <VBox spacing="8" styleClass="panel-body" VBox.vgrow="ALWAYS">
+            <TableView fx:id="recentTable" VBox.vgrow="ALWAYS" styleClass="desktop-table">
+                <placeholder>
+                    <Label text="No records available in the repository." styleClass="table-placeholder"/>
+                </placeholder>
+            </TableView>
+
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label fx:id="lblRecentNote" styleClass="status-label" text="Double-click any row to view record details."/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="btnViewSelected" text="View Selected Details" styleClass="button-desktop-secondary"/>
+            </HBox>
+        </VBox>
+    </TitledPane>
+
+</VBox>

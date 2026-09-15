@@ -1,0 +1,297 @@
+/* ============================================================
+   HEIRS Desktop — forms.css
+   Traditional Desktop Form Controls, TitledPanes, and TabPanes.
+   Clean desktop administrative panels, 2px radii, standard text inputs.
+   ============================================================ */
+
+/* ================= Control Panels ================= */
+
+.control-panel {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: -fx-border-color-desktop;
+    -fx-border-width: 1px;
+    -fx-border-radius: 2px;
+    -fx-background-radius: 2px;
+    -fx-padding: 5 8 5 8;
+}
+
+.filter-row {
+    -fx-spacing: 8px;
+}
+
+.filter-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+/* ================= Text Inputs & Dropdowns ================= */
+
+.desktop-text-field,
+.text-field {
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-font-size: 12px;
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #B8B8B8;
+    -fx-border-width: 1px;
+    -fx-border-radius: 2px;
+    -fx-background-radius: 2px;
+    -fx-padding: 3 6 3 6;
+    -fx-text-fill: #202020;
+}
+
+.desktop-text-field:focused,
+.text-field:focused {
+    -fx-border-color: #7BA4D0;
+}
+
+.desktop-combo-box,
+.combo-box {
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-font-size: 12px;
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #B8B8B8;
+    -fx-border-width: 1px;
+    -fx-border-radius: 2px;
+    -fx-background-radius: 2px;
+}
+
+.desktop-combo-box:focused,
+.combo-box:focused {
+    -fx-border-color: #7BA4D0;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #C7C7C7;
+    -fx-border-width: 1px;
+    -fx-font-size: 12px;
+}
+
+.combo-box-popup .list-cell {
+    -fx-padding: 3 6 3 6;
+    -fx-text-fill: #202020;
+}
+
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #EAEAEA;
+}
+
+.combo-box-popup .list-cell:filled:selected {
+    -fx-background-color: #D9E7F5;
+    -fx-text-fill: #202020;
+}
+
+.desktop-date-picker,
+.date-picker {
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-font-size: 12px;
+    -fx-border-color: #B8B8B8;
+    -fx-border-width: 1px;
+    -fx-border-radius: 2px;
+    -fx-background-radius: 2px;
+}
+
+.text-area {
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-font-size: 12px;
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #B8B8B8;
+    -fx-border-width: 1px;
+    -fx-border-radius: 2px;
+    -fx-background-radius: 2px;
+    -fx-text-fill: #202020;
+}
+
+.text-area:focused {
+    -fx-border-color: #7BA4D0;
+}
+
+/* ================= TitledPane ================= */
+
+.desktop-titled-pane {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #C7C7C7;
+    -fx-border-width: 1px;
+    -fx-border-radius: 2px;
+    -fx-background-radius: 2px;
+}
+
+.desktop-titled-pane > .title {
+    -fx-background-color: #E8E8E8;
+    -fx-border-color: transparent transparent #C7C7C7 transparent;
+    -fx-border-width: 1px;
+    -fx-padding: 4 8 4 8;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #202020;
+}
+
+.panel-body {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 8 10 8 10;
+}
+
+/* ================= Summary Grid & Labels ================= */
+
+.summary-grid {
+    -fx-background-color: transparent;
+}
+
+.grid-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #555555;
+}
+
+.grid-label-bold {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #202020;
+}
+
+.grid-value {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #202020;
+}
+
+.grid-value-bold {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #202020;
+}
+
+.grid-value-muted {
+    -fx-font-size: 11px;
+    -fx-text-fill: #777777;
+}
+
+.grid-hint {
+    -fx-font-size: 11px;
+    -fx-text-fill: #777777;
+}
+
+.status-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #555555;
+}
+
+.form-hint {
+    -fx-font-size: 11px;
+    -fx-text-fill: #777777;
+    -fx-font-style: italic;
+}
+
+/* ================= TabPane ================= */
+
+.desktop-tabpane {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #C7C7C7;
+    -fx-border-width: 1px;
+    -fx-border-radius: 2px;
+    -fx-background-radius: 2px;
+}
+
+.desktop-tabpane .tab-header-area {
+    -fx-background-color: #E8E8E8;
+    -fx-border-color: transparent transparent #C7C7C7 transparent;
+    -fx-border-width: 1px;
+    -fx-padding: 3 4 0 4;
+}
+
+.desktop-tabpane .tab {
+    -fx-background-color: #DCDCDC;
+    -fx-border-color: #C7C7C7 #C7C7C7 transparent #C7C7C7;
+    -fx-border-width: 1px;
+    -fx-border-radius: 2px 2px 0 0;
+    -fx-background-radius: 2px 2px 0 0;
+    -fx-padding: 3 12 3 12;
+}
+
+.desktop-tabpane .tab:selected {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #7A8590 #C7C7C7 transparent #C7C7C7;
+    -fx-border-width: 1px 1px 0 1px;
+}
+
+.desktop-tabpane .tab .tab-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #444444;
+}
+
+.desktop-tabpane .tab:selected .tab-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #202020;
+}
+
+.tab-content-pad {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 8 10 8 10;
+}
+
+/* ================= Charts ================= */
+
+.desktop-chart {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 4;
+}
+
+.desktop-chart .chart-title {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #202020;
+}
+
+/* ================= Architecture Box (About) ================= */
+
+.about-icon-glyph {
+    -fx-icon-color: #4A5568;
+}
+
+.about-app-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #202020;
+}
+
+.about-app-subtitle {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #555555;
+}
+
+.arch-tier-row {
+    -fx-background-color: #F8F9FA;
+    -fx-border-color: #C7C7C7;
+    -fx-border-width: 1px;
+    -fx-border-radius: 2px;
+    -fx-background-radius: 2px;
+    -fx-padding: 5 8 5 8;
+}
+
+.arch-badge {
+    -fx-background-color: #E2E6EA;
+    -fx-border-color: #B7B7B7;
+    -fx-border-width: 1px;
+    -fx-text-fill: #202020;
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+    -fx-padding: 1 6 1 6;
+    -fx-background-radius: 2px;
+    -fx-border-radius: 2px;
+}
+
+.arch-connector {
+    -fx-padding: 1 0 1 0;
+}
+
+.form-error {
+    -fx-text-fill: #9B2525;
+    -fx-font-size: 11px;
+}
+
+.desktop-hyperlink {
+    -fx-font-size: 12px;
+    -fx-text-fill: #1A5A96;
+    -fx-underline: true;
+}
