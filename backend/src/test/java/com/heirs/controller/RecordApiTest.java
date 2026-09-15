@@ -210,4 +210,33 @@ class RecordApiTest {
         .andExpect(status().isMethodNotAllowed())
         .andExpect(jsonPath("$.status").value(405));
   }
+
+  @Test
+  void sortsByWhitelistedReferenceAcrossDirections() throws Exception {
+    repository.saveAndFlush(TestRecords.entity("REF/2"));
+    mvc.perform(
+            get("/api/records")
+                .param("sortBy", "reference")
+                .param("sortDirection", "asc"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.content[0].referenceNumber").value("REF/1"))
+        .andExpect(jsonPath("$.content[1].referenceNumber").value("REF/2"));
+    mvc.perform(
+            get("/api/records")
+                .param("sortBy", "reference")
+                .param("sortDirection", "desc"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.content[0].referenceNumber").value("REF/2"))
+        .andExpect(jsonPath("$.content[1].referenceNumber").value("REF/1"));
+  }
+
+  @Test
+  void rejectsUnknownSortParametersWithBadRequest() throws Exception {
+    mvc.perform(get("/api/records").param("sortBy", "bogus").param("sortDirection", "asc"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.status").value(400));
+    mvc.perform(get("/api/records").param("sortBy", "reference").param("sortDirection", "up"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.status").value(400));
+  }
 }

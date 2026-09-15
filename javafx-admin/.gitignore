@@ -1,2 +1,5 @@
 target/
-*.logverification/
+dist/
+verification/smoke/
+verification/final-*/
+*.log

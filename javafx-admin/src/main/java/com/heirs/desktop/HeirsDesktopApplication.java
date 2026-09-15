@@ -18,7 +18,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
+import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.TabPane;
 import javafx.scene.image.WritableImage;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -85,9 +87,26 @@ public class HeirsDesktopApplication extends Application {
         primaryStage = stage;
         stage.show();
 
+        installGlobalShortcuts(scene, mainController);
+
         if (smokeMode) {
             runSmokeSequence();
         }
+    }
+
+    private void installGlobalShortcuts(Scene scene, MainController mainController) {
+        scene.addEventFilter(javafx.scene.input.KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == javafx.scene.input.KeyCode.F5) {
+                mainController.handleRefresh();
+                event.consume();
+            } else if (event.isShortcutDown() && event.getCode() == javafx.scene.input.KeyCode.F) {
+                navigator.navigateTo(ViewType.SEARCH);
+                if (navigator.currentController() instanceof com.heirs.desktop.controller.SearchController search) {
+                    search.focusSearchField();
+                }
+                event.consume();
+            }
+        });
     }
 
     @Override
@@ -151,9 +170,82 @@ public class HeirsDesktopApplication extends Application {
             wait.setOnFinished(e -> {
                 capture(view.name().toLowerCase(), primaryStage.getScene());
                 System.out.println("[SMOKE] " + view.name() + " ok");
+                if (view == ViewType.REPORTS) {
+                    smokeReportTabs(() -> stepSmoke(index + 1, views));
+                    return;
+                }
                 stepSmoke(index + 1, views);
             });
             wait.play();
+        } catch (Throwable t) {
+            failSmoke(t);
+        }
+    }
+
+    /* --- Reports-specific smoke extension: walk all six tabs (bounded). --- */
+
+    private void smokeReportTabs(Runnable onDone) {
+        try {
+            var tabPane = (TabPane) primaryStage.getScene().lookup("#reportsTabPane");
+            if (tabPane == null) {
+                failSmoke(new IllegalStateException("reportsTabPane not found"));
+                return;
+            }
+            waitReportsSettled(0, 30, tabPane, onDone);
+        } catch (Throwable t) {
+            failSmoke(t);
+        }
+    }
+
+    private void waitReportsSettled(int attempt, int maxAttempts, TabPane tabPane, Runnable onDone) {
+        try {
+            Button refresh = (Button) primaryStage.getScene().lookup("#btnRefresh");
+            if (attempt >= maxAttempts) {
+                failSmoke(new IllegalStateException("Reports did not finish loading"));
+                return;
+            }
+            if (refresh != null && !refresh.isDisabled()) {
+                walkReportTabs(tabPane, 0, List.of(
+                        "summary", "category", "status", "year", "department", "documents"), onDone);
+                return;
+            }
+            PauseTransition wait = new PauseTransition(Duration.millis(300));
+            wait.setOnFinished(e -> waitReportsSettled(attempt + 1, maxAttempts, tabPane, onDone));
+            wait.play();
+        } catch (Throwable t) {
+            failSmoke(t);
+        }
+    }
+
+    private void walkReportTabs(TabPane tabPane, int index, List<String> names, Runnable onDone) {
+        try {
+            if (index >= tabPane.getTabs().size()) {
+                verifyReportActions(onDone);
+                return;
+            }
+            tabPane.getSelectionModel().select(index);
+            PauseTransition wait = new PauseTransition(Duration.millis(400));
+            wait.setOnFinished(e -> {
+                capture("reports-" + names.get(index), primaryStage.getScene());
+                System.out.println("[SMOKE] reports tab " + names.get(index) + " ok");
+                walkReportTabs(tabPane, index + 1, names, onDone);
+            });
+            wait.play();
+        } catch (Throwable t) {
+            failSmoke(t);
+        }
+    }
+
+    private void verifyReportActions(Runnable onDone) {
+        try {
+            if (primaryStage.getScene().lookup("#btnRefresh") == null) {
+                throw new IllegalStateException("Refresh button missing on Reports screen");
+            }
+            if (primaryStage.getScene().lookup("#btnExport") == null) {
+                throw new IllegalStateException("Export button missing on Reports screen");
+            }
+            System.out.println("[SMOKE] reports actions (Refresh/Export) ok");
+            onDone.run();
         } catch (Throwable t) {
             failSmoke(t);
         }

@@ -5,7 +5,9 @@
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -21,34 +23,29 @@
       xmlns="http://javafx.com/javafx"
       spacing="10">
 
-    <!-- Screen Header -->
-    <HBox alignment="CENTER_LEFT" styleClass="screen-header">
+    <!-- Screen Header with report actions -->
+    <HBox alignment="CENTER_LEFT" spacing="12" styleClass="screen-header">
         <VBox spacing="2">
-            <Label styleClass="screen-title" text="Repository Reports &amp; Utility"/>
-            <Label styleClass="screen-subtitle" text="Institutional distribution, categorization metrics, and temporal records breakdown."/>
+            <Label styleClass="screen-title" text="Repository Reports &amp; Statistics"/>
+            <Label styleClass="screen-subtitle" text="Institutional distribution, categorization, temporal and document metrics computed from the live repository."/>
         </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <ProgressIndicator fx:id="loadingIndicator" progress="-1" prefWidth="18" prefHeight="18" visible="false"/>
+        <Button fx:id="btnRefresh" text="Refresh" styleClass="button-desktop-secondary" onAction="#onRefresh"/>
+        <Button fx:id="btnExport" text="Export Current Report..." styleClass="button-desktop-secondary" onAction="#onExport"/>
     </HBox>
 
     <!-- Traditional TabPane Workspace -->
     <TabPane fx:id="reportsTabPane" VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE"
              styleClass="desktop-tabpane">
 
-        <!-- Tab 1: Summary -->
+        <!-- Tab 1: Repository Summary -->
         <Tab text="Repository Summary">
             <VBox spacing="10" styleClass="tab-content-pad">
-                <Label text="Overall Repository Metrics" styleClass="section-header-label"/>
-                <TableView fx:id="summaryTable" prefHeight="200" styleClass="desktop-table">
+                <Label text="Repository Summary" styleClass="section-header-label"/>
+                <TableView fx:id="summaryTable" VBox.vgrow="ALWAYS" styleClass="desktop-table">
                     <placeholder>
-                        <Label text="No summary data available." styleClass="table-placeholder"/>
-                    </placeholder>
-                </TableView>
-
-                <Separator styleClass="section-divider"/>
-
-                <Label text="Departmental Distribution Overview" styleClass="section-header-label"/>
-                <TableView fx:id="departmentTable" VBox.vgrow="ALWAYS" styleClass="desktop-table">
-                    <placeholder>
-                        <Label text="No departmental breakdown available." styleClass="table-placeholder"/>
+                        <Label text="No report data available." styleClass="table-placeholder"/>
                     </placeholder>
                 </TableView>
             </VBox>
@@ -57,7 +54,7 @@
         <!-- Tab 2: By Category -->
         <Tab text="By Category">
             <HBox spacing="14" styleClass="tab-content-pad">
-                <VBox spacing="8" HBox.hgrow="ALWAYS" maxWidth="420" minWidth="340">
+                <VBox spacing="8" HBox.hgrow="ALWAYS" maxWidth="460" minWidth="360">
                     <Label text="Category Breakdown Table" styleClass="section-header-label"/>
                     <TableView fx:id="categoryTable" VBox.vgrow="ALWAYS" styleClass="desktop-table"/>
                 </VBox>
@@ -82,7 +79,7 @@
         <!-- Tab 3: By Status -->
         <Tab text="By Status">
             <HBox spacing="14" styleClass="tab-content-pad">
-                <VBox spacing="8" HBox.hgrow="ALWAYS" maxWidth="400" minWidth="320">
+                <VBox spacing="8" HBox.hgrow="ALWAYS" maxWidth="420" minWidth="340">
                     <Label text="Status Distribution Table" styleClass="section-header-label"/>
                     <TableView fx:id="statusTable" VBox.vgrow="ALWAYS" styleClass="desktop-table"/>
                 </VBox>
@@ -100,7 +97,7 @@
         <!-- Tab 4: By Year -->
         <Tab text="By Year">
             <HBox spacing="14" styleClass="tab-content-pad">
-                <VBox spacing="8" HBox.hgrow="ALWAYS" maxWidth="380" minWidth="300">
+                <VBox spacing="8" HBox.hgrow="ALWAYS" maxWidth="420" minWidth="340">
                     <Label text="Annual Publication Table" styleClass="section-header-label"/>
                     <TableView fx:id="yearTable" VBox.vgrow="ALWAYS" styleClass="desktop-table"/>
                 </VBox>
@@ -122,13 +119,56 @@
             </HBox>
         </Tab>
 
+        <!-- Tab 5: By Department -->
+        <Tab text="By Department">
+            <HBox spacing="14" styleClass="tab-content-pad">
+                <VBox spacing="8" HBox.hgrow="ALWAYS" minWidth="400">
+                    <Label text="Departmental Distribution Table" styleClass="section-header-label"/>
+                    <TableView fx:id="departmentTable" VBox.vgrow="ALWAYS" styleClass="desktop-table"/>
+                </VBox>
+
+                <Separator orientation="VERTICAL" styleClass="control-separator"/>
+
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="Departmental Distribution Chart" styleClass="section-header-label"/>
+                    <BarChart fx:id="departmentChart" animated="false" legendVisible="false" VBox.vgrow="ALWAYS"
+                              styleClass="desktop-chart">
+                        <xAxis>
+                            <CategoryAxis label="Department"/>
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis label="Record Count"/>
+                        </yAxis>
+                    </BarChart>
+                </VBox>
+            </HBox>
+        </Tab>
+
+        <!-- Tab 6: Supporting Documents -->
+        <Tab text="Documents">
+            <VBox spacing="8" styleClass="tab-content-pad">
+                <Label text="Supporting Document Statistics" styleClass="section-header-label"/>
+                <HBox spacing="10" styleClass="table-footer-strip" fx:id="docStatsStrip">
+                    <Label fx:id="docStatsLabel" styleClass="footer-status-label" text="Total Documents: -"/>
+                </HBox>
+                <Label fx:id="docWarningLabel" visible="false" managed="false"
+                       styleClass="footer-hint-label"
+                       text="Document statistics could not be fully loaded."/>
+                <TableView fx:id="documentsTable" VBox.vgrow="ALWAYS" styleClass="desktop-table">
+                    <placeholder>
+                        <Label text="No document statistics available." styleClass="table-placeholder"/>
+                    </placeholder>
+                </TableView>
+            </VBox>
+        </Tab>
+
     </TabPane>
 
     <!-- Reports Footer Strip -->
     <HBox alignment="CENTER_LEFT" spacing="10" styleClass="table-footer-strip">
-        <Label styleClass="footer-status-label" text="Data source: In-memory catalogue (60 records)"/>
+        <Label fx:id="reportStatusLabel" styleClass="footer-status-label" text="Reports not loaded."/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Label styleClass="footer-hint-label" text="Tabular reporting utility — Phase J1"/>
+        <Label fx:id="generatedLabel" styleClass="footer-hint-label" text=""/>
     </HBox>
 
 </VBox>

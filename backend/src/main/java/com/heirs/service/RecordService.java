@@ -11,6 +11,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,21 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @Transactional(readOnly = true)
 public class RecordService {
+  private static final Map<String, String> SORT_FIELDS =
+      Map.of(
+          "id", "id",
+          "title", "title",
+          "reference", "referenceNumber",
+          "referenceNumber", "referenceNumber",
+          "category", "category",
+          "department", "department",
+          "year", "publicationYear",
+          "publicationYear", "publicationYear",
+          "status", "status");
+
+  private static final Map<String, Sort.Direction> SORT_DIRECTIONS =
+      Map.of("asc", Sort.Direction.ASC, "desc", Sort.Direction.DESC);
+
   private final RecordRepository repository;
   private final RecordMapper mapper;
   private final DocumentService documents;
@@ -34,7 +51,14 @@ public class RecordService {
 
   public PageResponseDto<RecordResponseDto> getAllRecords(
       @Min(0) int page, @Min(1) @Max(100) int size) {
-    return PageResponseDto.from(repository.findAll(pageRequest(page, size)).map(mapper::toDto));
+    return getAllRecords(page, size, "id", "asc");
+  }
+
+  public PageResponseDto<RecordResponseDto> getAllRecords(
+      @Min(0) int page, @Min(1) @Max(100) int size,
+      @Size(max = 40) String sortBy, @Size(max = 10) String sortDirection) {
+    return PageResponseDto.from(
+        repository.findAll(pageRequest(page, size, sortBy, sortDirection)).map(mapper::toDto));
   }
 
   public RecordResponseDto getRecordById(@Positive Long id) {
@@ -43,9 +67,19 @@ public class RecordService {
 
   public PageResponseDto<RecordResponseDto> searchRecords(
       @NotNull @Valid RecordSearchRequestDto filter, @Min(0) int page, @Min(1) @Max(100) int size) {
+    return searchRecords(filter, page, size, "id", "asc");
+  }
+
+  public PageResponseDto<RecordResponseDto> searchRecords(
+      @NotNull @Valid RecordSearchRequestDto filter,
+      @Min(0) int page,
+      @Min(1) @Max(100) int size,
+      @Size(max = 40) String sortBy,
+      @Size(max = 10) String sortDirection) {
     return PageResponseDto.from(
         repository
-            .findAll(RecordSpecifications.matching(filter), pageRequest(page, size))
+            .findAll(
+                RecordSpecifications.matching(filter), pageRequest(page, size, sortBy, sortDirection))
             .map(mapper::toDto));
   }
 
@@ -70,7 +104,9 @@ public class RecordService {
 
   @Transactional
   public void deleteRecord(@Positive Long id) {
-    Record record = repository.lockById(id).orElseThrow(() -> new RecordNotFoundException(id));
+    Record record = repository
+        .lockById(id)
+        .orElseThrow(() -> new RecordNotFoundException(id));
     documents.deleteForRecord(id);
     repository.delete(record);
     repository.flush();
@@ -86,7 +122,12 @@ public class RecordService {
     return repository.findById(id).orElseThrow(() -> new RecordNotFoundException(id));
   }
 
-  private PageRequest pageRequest(int page, int size) {
-    return PageRequest.of(page, size, Sort.by("id").ascending());
+  private PageRequest pageRequest(
+      int page, int size, String sortBy, String sortDirection) {
+    String field = SORT_FIELDS.get(sortBy);
+    if (field == null) throw new IllegalArgumentException("Unknown sort field: " + sortBy);
+    Sort.Direction direction = SORT_DIRECTIONS.get(sortDirection.toLowerCase(Locale.ROOT));
+    if (direction == null) throw new IllegalArgumentException("Unknown sort direction: " + sortDirection);
+    return PageRequest.of(page, size, Sort.by(direction, field));
   }
 }

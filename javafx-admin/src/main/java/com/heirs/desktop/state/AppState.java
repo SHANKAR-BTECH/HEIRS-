@@ -60,4 +60,33 @@ public final class AppState {
     public void setTotalRecordsCount(long count) {
         this.totalRecordsCount.set("Records: " + count);
     }
+
+    private String searchQuery = "";
+    private String searchCategory;
+    private String searchYear;
+    private String searchStatus;
+    private String searchDepartment;
+    private String searchSortBy;
+    private String searchSortDirection;
+    private int searchPage;
+    private int searchPageSize = 100;
+
+    public String getSearchQuery() { return searchQuery; }
+    public void setSearchQuery(String searchQuery) { this.searchQuery = searchQuery; }
+    public String getSearchCategory() { return searchCategory; }
+    public void setSearchCategory(String searchCategory) { this.searchCategory = searchCategory; }
+    public String getSearchYear() { return searchYear; }
+    public void setSearchYear(String searchYear) { this.searchYear = searchYear; }
+    public String getSearchStatus() { return searchStatus; }
+    public void setSearchStatus(String searchStatus) { this.searchStatus = searchStatus; }
+    public String getSearchDepartment() { return searchDepartment; }
+    public void setSearchDepartment(String searchDepartment) { this.searchDepartment = searchDepartment; }
+    public String getSearchSortBy() { return searchSortBy; }
+    public void setSearchSortBy(String searchSortBy) { this.searchSortBy = searchSortBy; }
+    public String getSearchSortDirection() { return searchSortDirection; }
+    public void setSearchSortDirection(String searchSortDirection) { this.searchSortDirection = searchSortDirection; }
+    public int getSearchPage() { return searchPage; }
+    public void setSearchPage(int searchPage) { this.searchPage = searchPage; }
+    public int getSearchPageSize() { return searchPageSize; }
+    public void setSearchPageSize(int searchPageSize) { this.searchPageSize = searchPageSize; }
 }

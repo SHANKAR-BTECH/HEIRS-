@@ -26,7 +26,16 @@ GET `/api/records/{id}` returns HTTP 200 with exactly these fields:
 
 ## List and search
 
-GET `/api/records` supports `page` and `size`. GET `/api/records/search` supports all parameters below. Query parameters have no request body.
+GET `/api/records` supports `page`, `size`, `sortBy` and `sortDirection`. GET `/api/records/search` supports all parameters below plus the same sort parameters. Query parameters have no request body.
+
+List parameters:
+
+- `page` — zero-based page index to fetch; default `0`.
+- `size` — records per page, `1..100`; default `20`.
+- `sortBy` — whitelisted sort field; any of: `id`, `title`, `reference` (maps to `referenceNumber`), `referenceNumber`, `category`, `department`, `year` (maps to `publicationYear`), `publicationYear`, `status`. Default `id`.
+- `sortDirection` — `asc` or `desc`; default `asc`.
+
+Unknown `sortBy` fields and unknown `sortDirection` values are rejected with HTTP 400 (`IllegalArgumentException`). Sort direction is case-insensitive for the direction value; the field name is case-sensitive.
 
 | Parameter | Type/default | Rules |
 |---|---|---|

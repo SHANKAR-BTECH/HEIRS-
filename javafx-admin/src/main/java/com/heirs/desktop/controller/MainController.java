@@ -301,7 +301,7 @@ public class MainController {
         statusMessage.setText(message);
     }
 
-    private void handleRefresh() {
+    public void handleRefresh() {
         checkBackendConnection();
         ViewType current = navigator.currentView();
         if (current != null) {

@@ -68,6 +68,15 @@
                     <Button fx:id="searchButton" text="Search" styleClass="button-desktop-secondary"/>
                     <Button fx:id="clearFilters" text="Clear" styleClass="button-desktop-secondary"/>
                 </HBox>
+
+                <!-- Row 2: Sort By & Sort Direction -->
+                <Label text="Sort By:" styleClass="form-label" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <ComboBox fx:id="sortByFilter" maxWidth="Infinity" styleClass="desktop-combo-box"
+                          GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                <Label text="Direction:" styleClass="form-label" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+                <ComboBox fx:id="sortDirectionFilter" maxWidth="Infinity" styleClass="desktop-combo-box"
+                          GridPane.columnIndex="3" GridPane.rowIndex="2"/>
             </GridPane>
         </VBox>
     </TitledPane>
@@ -83,8 +92,16 @@
 
             <!-- Results status strip -->
             <HBox alignment="CENTER_LEFT" spacing="10" styleClass="table-footer-strip">
-                <Label fx:id="resultCount" styleClass="footer-status-label" text="Showing 60 of 60 records"/>
+                <Label text="Page Size:" styleClass="form-label"/>
+                <ComboBox fx:id="pageSizeFilter" prefWidth="90" styleClass="desktop-combo-box"/>
+                <Separator orientation="VERTICAL"/>
+                <Label text="Page:" styleClass="form-label"/>
+                <Label fx:id="pageInfoLabel" styleClass="footer-status-label" text="1 of 1"/>
                 <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="prevPageButton" text="‹ Prev" styleClass="button-desktop-secondary"/>
+                <Button fx:id="nextPageButton" text="Next ›" styleClass="button-desktop-secondary"/>
+                <Separator orientation="VERTICAL"/>
+                <Label fx:id="resultCount" styleClass="footer-status-label" text="Showing 60 of 60 records"/>
                 <Button fx:id="btnViewDetails" text="View Record Details" styleClass="button-desktop-secondary"/>
             </HBox>
         </VBox>

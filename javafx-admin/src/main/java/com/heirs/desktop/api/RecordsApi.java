@@ -66,12 +66,14 @@ public class RecordsApi {
     }
 
     public PagedResponse<RecordResponse> searchRecords(String query,
-                                                      String category,
-                                                      Integer year,
-                                                      String status,
-                                                      String department,
-                                                      int page,
-                                                      int size) {
+                                                       String category,
+                                                       Integer year,
+                                                       String status,
+                                                       String department,
+                                                       int page,
+                                                       int size,
+                                                       String sortBy,
+                                                       String sortDirection) {
         List<String> queryParams = new ArrayList<>();
         if (query != null && !query.isBlank()) {
             queryParams.add("q=" + encode(query.trim()));
@@ -87,6 +89,12 @@ public class RecordsApi {
         }
         if (department != null && !department.isBlank() && !"All Departments".equalsIgnoreCase(department)) {
             queryParams.add("department=" + encode(department.trim()));
+        }
+        if (sortBy != null && !sortBy.isBlank()) {
+            queryParams.add("sortBy=" + encode(sortBy.trim()));
+        }
+        if (sortDirection != null && !sortDirection.isBlank()) {
+            queryParams.add("sortDirection=" + encode(sortDirection.trim()));
         }
         queryParams.add("page=" + page);
         queryParams.add("size=" + size);

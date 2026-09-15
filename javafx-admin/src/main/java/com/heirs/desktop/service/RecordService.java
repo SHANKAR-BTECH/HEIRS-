@@ -81,9 +81,11 @@ public class RecordService {
                                        String status,
                                        String department,
                                        int page,
-                                       int size) {
+                                       int size,
+                                       String sortBy,
+                                       String sortDirection) {
         PagedResponse<RecordResponse> dtoPage = recordsApi.searchRecords(
-                query, category, year, status, department, page, size);
+                query, category, year, status, department, page, size, sortBy, sortDirection);
 
         List<Record> records = dtoPage.safeContent().stream()
                 .map(Record::from)

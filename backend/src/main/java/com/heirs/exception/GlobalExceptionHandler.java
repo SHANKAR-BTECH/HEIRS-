@@ -57,6 +57,12 @@ public class GlobalExceptionHandler {
 
   private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+  @ExceptionHandler(IllegalArgumentException.class)
+  ResponseEntity<ApiErrorDto> invalidArgument(
+      IllegalArgumentException ex, HttpServletRequest request) {
+    return error(400, ex.getMessage(), request, Map.of());
+  }
+
   @ExceptionHandler(RecordNotFoundException.class)
   ResponseEntity<ApiErrorDto> notFound(RecordNotFoundException ex, HttpServletRequest request) {
     return error(404, ex.getMessage(), request, Map.of());

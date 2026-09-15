@@ -35,15 +35,24 @@ public class SearchController implements NavigatorAware {
     @FXML private ComboBox<String> yearFilter;
     @FXML private ComboBox<String> statusFilter;
     @FXML private ComboBox<String> departmentFilter;
+    @FXML private ComboBox<String> sortByFilter;
+    @FXML private ComboBox<String> sortDirectionFilter;
     @FXML private Button clearFilters;
 
     @FXML private TableView<Record> resultsTable;
     @FXML private Label resultCount;
+    @FXML private Label pageInfoLabel;
+    @FXML private ComboBox<String> pageSizeFilter;
+    @FXML private Button prevPageButton;
+    @FXML private Button nextPageButton;
     @FXML private Button btnViewDetails;
 
     private Navigator navigator;
     private final RecordService recordService = new RecordService();
     private final ObservableList<Record> searchResults = FXCollections.observableArrayList();
+
+    private int currentPage;
+    private int currentPageSize = 100;
 
     @Override
     public void setNavigator(Navigator navigator) {
@@ -54,8 +63,10 @@ public class SearchController implements NavigatorAware {
     void initialize() {
         setupTable();
         setupFilters();
+        restoreSearchState();
 
         searchButton.setOnAction(e -> executeSearch());
+        searchField.setOnAction(e -> executeSearch());
 
         clearFilters.setOnAction(e -> {
             searchField.clear();
@@ -63,19 +74,85 @@ public class SearchController implements NavigatorAware {
             yearFilter.getSelectionModel().selectFirst();
             statusFilter.getSelectionModel().selectFirst();
             departmentFilter.getSelectionModel().selectFirst();
+            sortByFilter.getSelectionModel().selectFirst();
+            sortDirectionFilter.getSelectionModel().selectFirst();
+            currentPage = 0;
+            executeSearch();
+        });
+
+        pageSizeFilter.valueProperty().addListener((obs, oldV, newV) -> {
+            int parsed = newV == null ? 100 : Integer.parseInt(newV);
+            if (parsed != currentPageSize) {
+                currentPageSize = parsed;
+                currentPage = 0;
+                executeSearch();
+            }
+        });
+
+        prevPageButton.setOnAction(e -> {
+            if (currentPage > 0) {
+                currentPage--;
+                executeSearch();
+            }
+        });
+
+        nextPageButton.setOnAction(e -> {
+            currentPage++;
             executeSearch();
         });
 
         btnViewDetails.setOnAction(e -> {
-            Record selected = resultsTable.getSelectionModel().getSelectedItem();
-            if (selected == null) {
+            int selectedIndex = resultsTable.getSelectionModel().getSelectedIndex();
+            if (selectedIndex < 0 || selectedIndex >= searchResults.size()) {
                 UiBuilders.placeholderAlert(resultsTable.getScene().getWindow(), "Please select a record from the search results table.");
                 return;
             }
-            RecordDetailsDialog.show(resultsTable.getScene().getWindow(), selected.getId(), navigator.mainController().recordActions()::edit, navigator);
+            RecordDetailsDialog.showInOrder(resultsTable.getScene().getWindow(), searchResults,
+                    searchResults.get(selectedIndex), navigator.mainController().recordActions()::edit, navigator);
         });
 
         executeSearch();
+    }
+
+    public void focusSearchField() {
+        searchField.requestFocus();
+        searchField.selectAll();
+    }
+
+    private void restoreSearchState() {
+        AppState state = AppState.getInstance();
+        searchField.setText(state.getSearchQuery());
+        restoreCombo(categoryFilter, state.getSearchCategory());
+        restoreCombo(yearFilter, state.getSearchYear());
+        restoreCombo(statusFilter, state.getSearchStatus());
+        restoreCombo(departmentFilter, state.getSearchDepartment());
+        restoreCombo(sortByFilter, state.getSearchSortBy());
+        restoreCombo(sortDirectionFilter, state.getSearchSortDirection());
+        currentPage = state.getSearchPage();
+        int savedSize = state.getSearchPageSize();
+        if (savedSize >= 10 && pageSizeFilter.getItems().contains(String.valueOf(savedSize))) {
+            pageSizeFilter.setValue(String.valueOf(savedSize));
+            currentPageSize = savedSize;
+        }
+    }
+
+    private void restoreCombo(ComboBox<String> combo, String value) {
+        if (value != null && combo.getItems().contains(value)) {
+            combo.setValue(value);
+        }
+    }
+
+    private void saveSearchState() {
+        AppState state = AppState.getInstance();
+        state.setSearchQuery(searchField.getText() == null ? "" : searchField.getText());
+        state.setSearchCategory(categoryFilter.getValue());
+        state.setSearchYear(yearFilter.getValue());
+        state.setSearchStatus(statusFilter.getValue());
+        state.setSearchDepartment(departmentFilter.getValue());
+        state.setSearchSortBy(sortByFilter.getValue());
+        state.setSearchSortDirection(sortDirectionFilter.getValue());
+        state.setSearchPage(currentPage);
+        state.setSearchPageSize(currentPageSize);
     }
 
     private long loadGeneration;
@@ -86,41 +163,82 @@ public class SearchController implements NavigatorAware {
         String yearStr = yearFilter.getValue();
         String stat = statusFilter.getValue();
         String dept = departmentFilter.getValue();
+        String sortBy = sortByFilter.getValue();
+        String sortDirection = sortDirectionFilter.getValue();
 
         String normalizedCategory = (cat == null || "All Categories".equals(cat)) ? null : cat;
         String normalizedStatus = (stat == null || "All Statuses".equals(stat)) ? null : stat;
         String normalizedDept = (dept == null || "All Departments".equals(dept)) ? null : dept;
+        String normalizedSortBy = (sortBy == null || "Default".equals(sortBy)) ? null : toSortField(sortBy);
+        String normalizedSortDirection = (sortDirection == null || "Ascending".equals(sortDirection)) ? "asc" : "desc";
         Integer normalizedYear = null;
         if (yearStr != null && !"All Years".equals(yearStr)) {
             try {
                 normalizedYear = Integer.parseInt(yearStr.trim());
             } catch (NumberFormatException ignored) {}
         }
+        int page = currentPage;
+        int size = currentPageSize;
 
         searchButton.setDisable(true);
         showLoadingState();
 
         final Integer finalYear = normalizedYear;
+        final String finalSortBy = normalizedSortBy;
+        final String finalSortDirection = normalizedSortDirection;
         FxAsync.run(
-                () -> recordService.search(query, normalizedCategory, finalYear, normalizedStatus, normalizedDept, 0, 100),
+                () -> recordService.search(query, normalizedCategory, finalYear, normalizedStatus, normalizedDept, page, size, finalSortBy, finalSortDirection),
                 paged -> {
                     if (generation != loadGeneration) return;
                     searchButton.setDisable(false);
                     AppState.getInstance().setBackendConnected(true);
                     searchResults.setAll(paged.safeContent());
                     resultCount.setText("Showing " + paged.safeContent().size() + " of " + paged.totalElements() + " records matching criteria");
+                    updatePagination(paged.page(), paged.totalPages(), paged.first(), paged.last());
                     if (paged.safeContent().isEmpty()) {
                         showEmptyState();
                     }
+                    saveSearchState();
                 },
                 error -> {
                     if (generation != loadGeneration) return;
                     searchButton.setDisable(false);
                     AppState.getInstance().setBackendConnected(false);
                     searchResults.clear();
+                    pageInfoLabel.setText("1 of 1");
+                    prevPageButton.setDisable(true);
+                    nextPageButton.setDisable(true);
                     showErrorState(error);
                 }
         );
+    }
+
+    private void updatePagination(int page, int totalPages, boolean first, boolean last) {
+        currentPage = page;
+        int safeTotal = Math.max(totalPages, 1);
+        int safeCurrent = Math.max(page + 1, 1);
+        pageInfoLabel.setText(safeCurrent + " of " + safeTotal);
+        prevPageButton.setDisable(first || page <= 0);
+        nextPageButton.setDisable(last);
+    }
+
+    private static String toSortField(String label) {
+        switch (label) {
+            case "Reference":
+                return "reference";
+            case "Title":
+                return "title";
+            case "Category":
+                return "category";
+            case "Department":
+                return "department";
+            case "Year":
+                return "year";
+            case "Status":
+                return "status";
+            default:
+                return null;
+        }
     }
 
     private void showLoadingState() {
@@ -202,6 +320,15 @@ public class SearchController implements NavigatorAware {
                 "Central University Bureau",
                 "Finance & Grants Committee");
         departmentFilter.getSelectionModel().selectFirst();
+
+        sortByFilter.getItems().setAll("Default", "Reference", "Title", "Category", "Department", "Year", "Status");
+        sortByFilter.getSelectionModel().selectFirst();
+
+        sortDirectionFilter.getItems().setAll("Ascending", "Descending");
+        sortDirectionFilter.getSelectionModel().selectFirst();
+
+        pageSizeFilter.getItems().setAll("10", "20", "50", "100");
+        pageSizeFilter.setValue("100");
     }
 
     private void setupTable() {
@@ -239,7 +366,11 @@ public class SearchController implements NavigatorAware {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     Window owner = resultsTable.getScene().getWindow();
-                    RecordDetailsDialog.show(owner, row.getItem().getId(), navigator.mainController().recordActions()::edit, navigator);
+                    int index = row.getIndex();
+                    if (index >= 0 && index < searchResults.size()) {
+                        RecordDetailsDialog.showInOrder(owner, searchResults, searchResults.get(index),
+                                navigator.mainController().recordActions()::edit, navigator);
+                    }
                 }
             });
             return row;

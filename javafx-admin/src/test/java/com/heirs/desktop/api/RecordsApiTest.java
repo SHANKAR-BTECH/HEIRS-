@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.heirs.desktop.config.ApiConfig;
 import com.heirs.desktop.dto.CategoryResponse;
 import com.heirs.desktop.dto.PagedResponse;
@@ -108,5 +109,67 @@ public class RecordsApiTest {
         ApiConfig.setOverrideBaseUrl("http://localhost:9090/");
         assertEquals("http://localhost:9090", ApiConfig.getBaseUrl());
         ApiConfig.setOverrideBaseUrl(null);
+    }
+
+    @Test
+    public void testSearchRecordsSendsSortParams() {
+        CapturingApiClient client = new CapturingApiClient();
+        RecordsApi recordsApi = new RecordsApi(client);
+
+        recordsApi.searchRecords("digital", "Policy", 2026, "Active", "Higher Education Department", 0, 20, "year", "desc");
+
+        assertNotNull(client.lastPath, "A search request should have been issued");
+        String path = client.lastPath;
+        assertTrue(path.contains("sortBy=year"), "Expected sortBy=year but got " + path);
+        assertTrue(path.contains("sortDirection=desc"), "Expected sortDirection=desc but got " + path);
+        assertTrue(path.contains("q=digital"), "Expected q=digital but got " + path);
+        assertTrue(path.contains("category=Policy"), "Expected category=Policy but got " + path);
+        assertTrue(path.contains("page=0"), "Expected page=0 but got " + path);
+        assertTrue(path.contains("size=20"), "Expected size=20 but got " + path);
+        assertTrue(path.startsWith("/api/records/search?"), "Search endpoint should be used but got " + path);
+    }
+
+    @Test
+    public void testSearchRecordsOmitsEmptySortParams() {
+        CapturingApiClient client = new CapturingApiClient();
+        RecordsApi recordsApi = new RecordsApi(client);
+
+        recordsApi.searchRecords("digital", null, null, null, null, 1, 50, null, null);
+
+        assertNotNull(client.lastPath, "A search request should have been issued");
+        assertFalse(client.lastPath.contains("sortBy="), "Null sortBy should be omitted but got " + client.lastPath);
+        assertFalse(client.lastPath.contains("sortDirection="), "Null sortDirection should be omitted but got " + client.lastPath);
+        assertTrue(client.lastPath.contains("page=1"), "Expected page=1 but got " + client.lastPath);
+        assertTrue(client.lastPath.contains("size=50"), "Expected size=50 but got " + client.lastPath);
+    }
+
+    /**
+     * Captures the endpoint path passed to ApiClient.get without opening a real
+     * network connection. ApiClient.get(String, TypeReference) is overridden only;
+     * the canned response is an empty paged envelope sufficient for the caller.
+     */
+    private static final class CapturingApiClient extends ApiClient {
+        volatile String lastPath;
+
+        @Override
+        public <T> T get(String endpointPath, TypeReference<T> responseType) {
+            lastPath = endpointPath;
+            String json = """
+                          {
+                            "content": [],
+                            "page": 0,
+                            "size": 20,
+                            "totalElements": 0,
+                            "totalPages": 0,
+                            "first": true,
+                            "last": true
+                          }
+                          """;
+            try {
+                return JsonUtil.fromJson(json, responseType);
+            } catch (Exception e) {
+                throw new RuntimeException("Unable to parse canned paged response in test", e);
+            }
+        }
     }
 }

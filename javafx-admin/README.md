@@ -1,6 +1,6 @@
 # HEIRS — JavaFX Desktop Administration
 
-Phase **J4 — Real Supporting Document Management**.
+Phase **J6 — Reports & Statistics**.
 
 A traditional JavaFX 21 desktop client. The MenuBar, ToolBar, TreeView, TableView, grey/white styling, plain category/status text, dialogs and bottom status bar remain the J1 interface.
 
@@ -21,6 +21,36 @@ JavaFX controller → RecordService / DocumentService
 The API URL resolves from JVM property `heirs.api.baseUrl`, environment variable `HEIRS_API_BASE_URL`, then `http://127.0.0.1:8080`. Connect timeout is 4 seconds; request timeout is 8 seconds.
 
 JavaFX never touches the backend storage folder directly. Every document operation — list, upload, preview/open, download, replace, delete — goes through the Spring Boot document REST API.
+
+## Reports & Statistics (Phase J6)
+
+The **Reports** screen is a real data-reporting module built on the live backend repository. Reports are computed from the **full repository** (the desktop pages through `GET /api/records` following backend pagination, never a single page), then aggregated immutably. **There is no fake or demo reporting data.**
+
+Six tabs, each TableView-first with a small traditional chart (no KPI cards or dashboard tiles):
+
+- **Repository Summary** — total record count, per-category and per-status record counts, departments represented, years represented, and supporting-document totals.
+- **By Category** — record counts and percentages per category (blank → "Uncategorized"), sorted by count then name, with a bar chart.
+- **By Status** — record counts and percentages per status (blank → "Unknown"), sorted by count then name, with a pie chart.
+- **By Year** — record counts per publication year (newest first; missing/invalid years grouped as "Unknown"), with a trend bar chart.
+- **By Department** — record counts and percentages per department, sorted by count then name, with a bar chart.
+- **Documents** — per-record supporting-document counts and stored-file sizes (largest first), plus totals, averages and byte storage shown in the tab strip.
+
+Supporting-document metadata is fetched per record through `GET /api/records/{id}/documents` with **bounded concurrency** (a small parallel pool). Individual fetch failures never corrupt the tables — partial loads are flagged with a "Document statistics could not be fully loaded" warning.
+
+CSV export (see [J6_VERIFICATION.md](J6_VERIFICATION.md)) writes the currently visible tab to a UTF-8, safely escaped `.csv` via **Refresh**/**Export Current Report…**; filenames follow `HEIRS_<Type>_Report_<yyyy-MM-dd>.csv`. All aggregation is immutable (`ReportData` snapshot with a `generatedAt` timestamp); a generation guard drops stale async results; the selected tab is preserved across refreshes.
+
+Reports require the backend. If Spring Boot is unreachable the screen shows **"Unable to load reports. Backend Offline."** with a **Retry** control; once the backend is back it regenerates normally.
+
+Reports use ONLY Spring Boot REST data. **JavaFX does not directly access MySQL** — no JDBC, database drivers, or SQL in this module.
+
+## Search sorting, pagination & usability (Phase J5)
+
+The Search & Retrieval screen includes **Sort By** (Reference, Title, Category, Department, Year, Status) and **Direction** (Ascending / Descending) controls. They are sent to Spring Boot as `sortBy` and `sortDirection` on `GET /api/records/search` only when a non-default sort is chosen, and map the display labels to the backend whitelist (`reference`, `title`, `category`, `department`, `year`, `status`). The backend rejects unknown fields with HTTP 400; the desktop never sends arbitrary sort values. Sorting applies to the whole result set matching the criteria, not just the current page, because ordering is delegated to the backend query.
+
+- **Pagination:** instead of a fixed single 100-row page, the results strip now offers a Page Size selector (10 / 20 / 50 / 100), a `‹ Prev` / `Next ›` control, and a `X of N` page indicator. Prev/Next are disabled at the first/last page and re-query the backend, keeping sort order applied.
+- **Keyboard shortcuts:** Enter in the Keyword field runs the search, `F5` refreshes the current view and backend connection, and `Ctrl+F` jumps to the Search screen and focuses the Keyword field.
+- **Record Details navigation:** Previous / Next buttons in the Record Details dialog step through the current search result set (enabled only when opened from the Search results table; disabled at either end).
+- **State retention:** the last search criteria, page, and page size are saved in `AppState` and restored when returning to the Search screen, so navigation does not lose the active query.
 
 ## Document workflows (Phase J4)
 
